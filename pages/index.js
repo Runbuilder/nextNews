@@ -1,5 +1,6 @@
-// pages/index.js
+import React, { useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import Card from '../components/Card';
 import moneyImage from '@/public/money.jpg'; // 이미지 경로를 정확히 지정해주세요
 
@@ -117,13 +118,35 @@ const Footer = styled.footer`
   flex-shrink: 0;
 `;
 
+const LoadingMessage = styled.p`
+  text-align: center;
+  font-size: 1.2em;
+  color: #666;
+`;
+
 const App = ({ featuredPosts = [], error = null }) => {
+  const [displayedPosts, setDisplayedPosts] = useState(featuredPosts.slice(0, 5));
+  const [hasMore, setHasMore] = useState(true);
+
   const handleButtonClick = () => {
     console.log("View Latest Posts clicked");
   };
 
   const recommendedPosts = featuredPosts.filter(post => post.추천 === true);
-  const recentPosts = featuredPosts;
+
+  const fetchMoreData = () => {
+    if (displayedPosts.length >= featuredPosts.length) {
+      setHasMore(false);
+      return;
+    }
+    
+    setTimeout(() => {
+      setDisplayedPosts(prevPosts => [
+        ...prevPosts,
+        ...featuredPosts.slice(prevPosts.length, prevPosts.length + 5)
+      ]);
+    }, 500);
+  };
 
   return (
     <>
@@ -164,9 +187,15 @@ const App = ({ featuredPosts = [], error = null }) => {
           )}
         </PostsContainer>
         <SectionTitle>부자뉴스</SectionTitle>
-        <PostsContainer>
-          {recentPosts.length > 0 ? (
-            recentPosts.map((post, index) => (
+        <InfiniteScroll
+          dataLength={displayedPosts.length}
+          next={fetchMoreData}
+          hasMore={hasMore}
+          loader={<LoadingMessage>Loading...</LoadingMessage>}
+          endMessage={<LoadingMessage>모든 뉴스를 불러왔습니다.</LoadingMessage>}
+        >
+          <PostsContainer>
+            {displayedPosts.map((post, index) => (
               <Card 
                 key={index}
                 image={post.이모지}
@@ -176,11 +205,9 @@ const App = ({ featuredPosts = [], error = null }) => {
                 source={post.출처}
                 category={post.카테고리}
               />
-            ))
-          ) : (
-            <p>부자 뉴스가 없습니다.</p>
-          )}
-        </PostsContainer>
+            ))}
+          </PostsContainer>
+        </InfiniteScroll>
       </MainContent>
       <Footer>
         by Runbuilder
