@@ -9,3 +9,38 @@ body {
 h2 {
   margin: 20px 0;
 }
+
+.custom-swal-container {
+  z-index: 1000;
+}
+
+.custom-swal-popup {
+  width: 100% !important;
+  max-width: 800px !important;
+  padding: 20px;
+}
+
+.custom-html-container {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.custom-content {
+  text-align: left;
+  font-size: 1.2em;
+  line-height: 1.6;
+}
+
+.custom-content p {
+  margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .custom-swal-popup {
+    max-width: 95% !important;
+  }
+  
+  .custom-content {
+    font-size: 0.8em;
+  }
+}

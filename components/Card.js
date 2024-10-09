@@ -1,43 +1,99 @@
-// components/Card.js
+import React from 'react';
 import styled from 'styled-components';
+import Swal from 'sweetalert2';
+
+const pastelColors = [
+  '#BAFFC9', '#BAE1FF', '#FFFFBA', '#FFDFBA', '#FFB3BA'
+];
 
 const CardContainer = styled.div`
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  margin: 10px;
-  overflow: hidden;
   width: 100%;
   max-width: 300px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  background-color: ${props => props.backgroundColor};
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+
+  @media (min-width: 768px) {
+    width: calc(50% - 20px);
+  }
+
+  @media (min-width: 1024px) {
+    width: calc(25% - 20px);
+  }
 `;
 
-const CardImage = styled.img`
-  width: 100%;
-  height: auto;
+const CategoryTag = styled.div`
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background-color: ${props => props.color};
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-weight: bold;
 `;
 
-const CardContent = styled.div`
-  padding: 15px;
+const CardImage = styled.div`
+  font-size: 72px;
+  margin-bottom: 16px;
 `;
 
-const Title = styled.h3`
-  margin: 0;
+const CardTitle = styled.h3`
+  margin: 8px 0;
   font-size: 1.2em;
+  color: #333;
 `;
 
-const Date = styled.p`
-  color: #888;
+const CardDate = styled.p`
+  color: #666;
   font-size: 0.9em;
 `;
 
-const Card = ({ title, date, image }) => (
-  <CardContainer>
-    <CardImage src={image} alt={title} />
-    <CardContent>
-      <Title>{title}</Title>
-      <Date>{date}</Date>
-    </CardContent>
-  </CardContainer>
-);
+const Card = ({ image, title, date, content, source, category }) => {
+  const backgroundColor = pastelColors[Math.floor(Math.random() * pastelColors.length)];
+  const categoryColor = `hsl(${Math.random() * 360}, 70%, 30%)`;
+
+  const handleCardClick = () => {
+    Swal.fire({
+      title: title,
+      html: `<div style="font-size: 1.3em; max-width: 90vw; overflow: auto;  text-align: left;white-space: pre-wrap;">${content}</div>`,
+      showCancelButton: true,
+      cancelButtonText: "닫기",
+      confirmButtonText: "뉴스기사",
+      width: 'auto',
+      maxWidth: '90%',
+      customClass: {
+        container: 'custom-swal-container',
+        popup: 'custom-swal-popup',
+        htmlContainer: 'custom-html-container'
+      },
+      grow: 'row',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.open(source, '_blank');
+      }
+    });
+  };
+
+  return (
+    <CardContainer onClick={handleCardClick} backgroundColor={backgroundColor}>
+      <CategoryTag color={categoryColor}>{category}</CategoryTag>
+      <CardImage>{image}</CardImage>
+      <CardTitle>{title}</CardTitle>
+      <CardDate>{date}</CardDate>
+    </CardContainer>
+  );
+};
 
 export default Card;
