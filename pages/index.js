@@ -44,7 +44,7 @@ const HeroSection = styled.div`
 const Header = styled.h1`
   font-size: 2.5em;
   margin: 0;
-  color: white; // 명시적으로 흰색 지정
+  color: white; // 명시적로 흰색 지정
 `;
 
 const SubHeader = styled.p`
@@ -122,8 +122,8 @@ const App = ({ featuredPosts = [], error = null }) => {
     console.log("View Latest Posts clicked");
   };
 
-  const recommendedPosts = featuredPosts.filter(post => post.추천 === true).slice(0, 2);
-  const recentPosts = featuredPosts.slice(0, 4);
+  const recommendedPosts = featuredPosts.filter(post => post.추천 === true);
+  const recentPosts = featuredPosts;
 
   return (
     <>
