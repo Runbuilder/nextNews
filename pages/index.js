@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Card from '../components/Card';
+import StockPrediction from '../components/StockPrediction';
 import moneyImage from '@/public/money.jpg'; // 이미지 경로를 정확히 지정해주세요
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const GlobalStyle = createGlobalStyle`
   html, body {
@@ -38,8 +40,8 @@ const HeroSection = styled.div`
   padding: 50px 20px;
   border-radius: 8px;
   margin-bottom: 20px;
-  color: white; // 모든 텍스트 색상을 흰색으로 변경
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5); // 텍스트 가독성을 위한 그림자 추가
+  color: white; // 모든 텍스트 색상을 ���색으로 변경
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5); // 텍트 가독성을 위한 그림자 추가
 `;
 
 const Header = styled.h1`
@@ -124,27 +126,56 @@ const LoadingMessage = styled.p`
   color: #666;
 `;
 
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+`;
+
 const App = ({ featuredPosts = [], error = null }) => {
-  const [displayedPosts, setDisplayedPosts] = useState(featuredPosts.slice(0, 5));
+  const [sortedPosts, setSortedPosts] = useState([]);
+  const [displayedPosts, setDisplayedPosts] = useState([]);
   const [hasMore, setHasMore] = useState(true);
+  const [showPrediction, setShowPrediction] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const sorted = [...featuredPosts].sort((a, b) => new Date(b.날짜) - new Date(a.날짜));
+    setSortedPosts(sorted);
+    setDisplayedPosts(sorted.slice(0, 10)); // 초기에 더 많은 포스트를 표시
+    setHasMore(sorted.length > 10);
+  }, [featuredPosts]);
 
   const handleButtonClick = () => {
-    console.log("View Latest Posts clicked");
+    setShowPrediction(true);
   };
 
-  const recommendedPosts = featuredPosts.filter(post => post.추천 === true);
+  const handleClosePrediction = () => {
+    setShowPrediction(false);
+  };
+
+  // 추천 뉴스도 날짜순으로 정렬
+  const recommendedPosts = sortedPosts
+    .filter(post => post.추천 === true)
+    .sort((a, b) => new Date(b.날짜) - new Date(a.날짜));
 
   const fetchMoreData = () => {
-    if (displayedPosts.length >= featuredPosts.length) {
+    if (displayedPosts.length >= sortedPosts.length) {
       setHasMore(false);
       return;
     }
     
+    setIsLoading(true);
     setTimeout(() => {
       setDisplayedPosts(prevPosts => [
         ...prevPosts,
-        ...featuredPosts.slice(prevPosts.length, prevPosts.length + 5)
+        ...sortedPosts.slice(prevPosts.length, prevPosts.length + 10)
       ]);
+      setIsLoading(false);
     }, 500);
   };
 
@@ -153,9 +184,9 @@ const App = ({ featuredPosts = [], error = null }) => {
       <GlobalStyle />
       <MainContent>
         <HeroSection>
-          <Header>Let's do it together.</Header>
-          <SubHeader>We travel the world in search of stories. Come along for the ride.</SubHeader>
-          <Button onClick={handleButtonClick}>View Latest Posts</Button>
+          <Header>부자뉴스</Header>
+          <SubHeader>AI가 선별한 최신 경제 뉴스</SubHeader>
+          <Button onClick={handleButtonClick}>주가 예측하기</Button>
         </HeroSection>
         <Navigation>
           <NavList>
@@ -180,6 +211,7 @@ const App = ({ featuredPosts = [], error = null }) => {
                 content={post.내용}
                 source={post.출처}
                 category={post.카테고리}
+                backgroundColor={post.색상} // 새로 추가된 색상 정보
               />
             ))
           ) : (
@@ -191,8 +223,8 @@ const App = ({ featuredPosts = [], error = null }) => {
           dataLength={displayedPosts.length}
           next={fetchMoreData}
           hasMore={hasMore}
-          loader={<LoadingMessage>Loading...</LoadingMessage>}
-          endMessage={<LoadingMessage>모든 뉴스를 불러왔습니다.</LoadingMessage>}
+          loader={isLoading && <LoadingSpinner />}
+          scrollThreshold={0.9}
         >
           <PostsContainer>
             {displayedPosts.map((post, index) => (
@@ -204,6 +236,7 @@ const App = ({ featuredPosts = [], error = null }) => {
                 content={post.내용}
                 source={post.출처}
                 category={post.카테고리}
+                backgroundColor={post.색상} // 새로 추가된 색상 정보
               />
             ))}
           </PostsContainer>
@@ -212,6 +245,11 @@ const App = ({ featuredPosts = [], error = null }) => {
       <Footer>
         by Runbuilder
       </Footer>
+      {showPrediction && (
+        <Overlay>
+          <StockPrediction onClose={handleClosePrediction} />
+        </Overlay>
+      )}
     </>
   );
 };

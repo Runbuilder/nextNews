@@ -2,9 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Swal from 'sweetalert2';
 
-const pastelColors = [
-  '#BAFFC9', '#BAE1FF', '#FFFFBA', '#FFDFBA', '#FFB3BA'
-];
+// pastelColors 배열은 이제 사용하지 않으므로 제거합니다.
 
 const CardContainer = styled.div`
   width: 100%;
@@ -14,7 +12,7 @@ const CardContainer = styled.div`
   padding: 16px;
   text-align: center;
   cursor: pointer;
-  background-color: ${props => props.backgroundColor};
+  background-color: ${props => props.$backgroundColor || '#FFFFFF'}; // 기본값으로 흰색 설정
   position: relative;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
@@ -60,9 +58,31 @@ const CardDate = styled.p`
   font-size: 0.9em;
 `;
 
-const Card = ({ image, title, date, content, source, category }) => {
-  const backgroundColor = pastelColors[Math.floor(Math.random() * pastelColors.length)];
-  const categoryColor = `hsl(${Math.random() * 360}, 70%, 30%)`;
+const formatDate = (dateString) => {
+  // 먼저 'Z'를 제거하고 밀리초를 잘라냅니다.
+  dateString = dateString.replace('Z', '').split('.')[0];
+  
+  const date = new Date(dateString);
+  
+  // 날짜가 유효한지 확인합니다.
+  if (isNaN(date.getTime())) {
+    // 유효하지 않은 경우, 원본 문자열에서 날짜 부분만 추출합니다.
+    const match = dateString.match(/(\d{4})-(\d{2})-(\d{2})/);
+    if (match) {
+      return `${match[1]}.${match[2]}.${match[3]}`;
+    }
+    return '날짜 없음'; // 날짜 형식이 완전히 다른 경우
+  }
+  
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  
+  return `${year}.${month}.${day}`;
+};
+
+const Card = ({ image, title, date, content, source, category, backgroundColor }) => {
+  const categoryColor = `hsl(${Math.random() * 360}, 70%, 30%)`; // 카테고리 색상은 여전히 랜덤으로 설정
 
   const handleCardClick = () => {
     Swal.fire({
@@ -87,11 +107,11 @@ const Card = ({ image, title, date, content, source, category }) => {
   };
 
   return (
-    <CardContainer onClick={handleCardClick} backgroundColor={backgroundColor}>
+    <CardContainer $backgroundColor={backgroundColor} onClick={handleCardClick}>
       <CategoryTag color={categoryColor}>{category}</CategoryTag>
       <CardImage>{image}</CardImage>
       <CardTitle>{title}</CardTitle>
-      <CardDate>{date}</CardDate>
+      <CardDate>{formatDate(date)}</CardDate>
     </CardContainer>
   );
 };
