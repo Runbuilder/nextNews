@@ -16,8 +16,8 @@ const Overlay = styled.div`
 `;
 
 const PopupContent = styled.div`
-  background-color: ${({ theme }) => (theme === 'dark' ? '#444' : 'white')}; // 테마에 따른 배경색
-  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')}; // 테마에 따른 글자색
+  background-color: ${({ theme }) => (theme === 'dark' ? '#444' : 'white')};
+  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')};
   padding: 30px;
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(0,0,0,0.2);
@@ -42,7 +42,7 @@ const PopupContainer = styled.div`
   max-width: 800px;
   text-align: center;
   box-sizing: border-box;
-  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')}; // 테마에 따른 글자색
+  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')};
 
   @media (max-width: 768px) {
     width: 95%;
@@ -52,12 +52,11 @@ const PopupContainer = styled.div`
 
 const Title = styled.h2`
   color: #333;
-  font-size: 4.5rem; // 크기를 더 크게 조정
+  font-size: 4.5rem;
   margin-bottom: 3px;
-  text-align: center; // 가운데 정렬
-  font-weight: bold; // 글씨를 더 굵게 (선택사항)
-  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')}; // 테마에 따른 글자색
-
+  text-align: center;
+  font-weight: bold;
+  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')};
 `;
 
 const InputContainer = styled.div`
@@ -77,12 +76,12 @@ const Input = styled.input`
   padding: 15px;
   border: 1px solid #ddd;
   border-radius: 5px;
-  font-size: 20px; // 폰트 크기 증가
+  font-size: 20px;
   max-width: 400px;
 
   @media (max-width: 480px) {
     width: 100%;
-    font-size: 18px; // 모바일에서 폰트 크기 조정
+    font-size: 18px;
   }
 `;
 
@@ -107,7 +106,6 @@ const CloseButton = styled.button`
   right: 10px;
   background: #ff4136;
   border-radius: 5px;
-
   border: none;
   font-size: 30px;
   cursor: pointer;
@@ -120,8 +118,7 @@ const ResultContainer = styled.div`
   background-color: #f0f0f0;
   border-radius: 5px;
   font-size: 18px;
-  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')}; // 테마에 따른 글자색
-
+  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')};
 `;
 
 const spin = keyframes`
@@ -149,11 +146,11 @@ const LoadingContainer = styled.div`
 const Button = styled.button`
   background-color: #4CAF50;
   color: white;
-  padding: 15px 25px; // 패딩 증가
+  padding: 15px 25px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 20px; // 폰트 크기 증가
+  font-size: 20px;
   white-space: nowrap;
   transition: background-color 0.3s ease;
 
@@ -162,15 +159,15 @@ const Button = styled.button`
   }
 
   @media (max-width: 480px) {
-    font-size: 18px; // 모바일에서 폰트 크기 조정
-    padding: 12px 20px; // 모바일에서 패딩 조정
+    font-size: 18px;
+    padding: 12px 20px;
   }
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
-  gap: 15px; // 버튼 간격 증가
+  gap: 15px;
   margin-top: 20px;
 
   @media (max-width: 480px) {
@@ -218,22 +215,26 @@ const StockPrediction = ({ onClose, theme }) => {
 
     try {
       const response = await fetch(`${API_URL}?method=portfolioAI&name=${encodeURIComponent(stockName)}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.text();
 
-      if (data && data.startsWith('https://')) {
+      if (data && data.trim().startsWith('https://')) {
         setResult(`
           <h3>${stockName} 예측 차트</h3>
-          <img src="${data}" alt="${stockName} 예측 차트" style="max-width: 100%; height: auto;" />
+          <img src="${data.trim()}" alt="${stockName} 예측 차트" style="max-width: 100%; height: auto;" />
           <p>1) 장 거래 시간에만 예측 그래프가 표기되며, <strong>장외 시간에는 현재 시세 그래프만 표기</strong>됩니다.</p>
           <p>2) 예측 가능한 시간은 현시점에서 1분~5분 이내입니다. <strong>예측 성공률은 보장하지 않으며, 매수 매도 전에 참고용으로만 활용</strong>하시길 바랍니다.</p>
           <p>3) 예측 결과에 따라 사람이 직접 추격 매수 및 손절 할 경우, 매매 시간 지연에 따라 손실이 발생할 수 있으며, 시간 지연 문제에 도움을 받기 위해선 <a href="https://highbuff.com/person" target="_blank">HIGHBUFF AI</a> 서비스를 무료 체험해 보시길 바랍니다.</p>
           <p>4) 이 정보를 활용한 투자 책임은 본인에게 있으며, 자세한 알고리즘 및 기술에 관련된 자세한 정보는 <a href="https://highbuff.com/person" target="_blank">HIGHBUFF AI</a>에서 확인 가능합니다.</p>
         `);
       } else {
-        setError(`${stockName}에 대한 예측 차트를 생성하기 위한 데이터가 충분하지 않습니다. 다른 종목을 입력해 주시기 바랍니다.`);
+        setError(`${stockName}에 대한 예측 차트를 생성할 수 없습니다. 다른 종목을 입력해 주세요.`);
       }
     } catch (error) {
-      handleError(error);
+      console.error('Error fetching stock forecast:', error);
+      setError(`😪현재는 주가를 예측할 수 있는 상황입니다. 나중에 다시 시도해 주세요.`);
     } finally {
       setIsLoading(false);
     }
@@ -246,20 +247,24 @@ const StockPrediction = ({ onClose, theme }) => {
 
     try {
       const response = await fetch(`${API_URL}?method=marketCap`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
 
       let html = `<h3>${market} 시가총액 순위</h3>`;
 
-      if (data[market.toLowerCase()]) {
+      if (data && data[market.toLowerCase()]) {
         html += createMarketCapTable(data[market.toLowerCase()]);
         html += '<p>위 종목 중 예측 차트를 보고 싶은 종목이 있다면 종목명을 입력해주세요.</p>';
       } else {
-        html += `<p>${market} 시가총액 데이터를 불러오지 못했습니다.</p>`;
+        throw new Error(`${market} 시가총액 데이터를 불러오지 못했습니다.`);
       }
 
       setResult(html);
     } catch (error) {
-      handleError(error);
+      console.error('Error fetching market cap:', error);
+      setError(`시가총액 정보를 가져오는 중 오류가 발생했습니다. 다시 시도해 주세요.`);
     } finally {
       setIsLoading(false);
     }
@@ -277,11 +282,6 @@ const StockPrediction = ({ onClose, theme }) => {
     });
     html += '</table>';
     return html;
-  };
-
-  const handleError = (error) => {
-    console.error('Error:', error);
-    setError("조회중 오류가 발생했습니다. 다시 시도해주세요.");
   };
 
   return (
@@ -302,7 +302,7 @@ const StockPrediction = ({ onClose, theme }) => {
           <Button onClick={() => getMarketCap('KOSPI')}>KOSPI 시가총액</Button>
           <Button onClick={() => getMarketCap('KOSDAQ')}>KOSDAQ 시가총액</Button>
         </ButtonContainer>
-        {error && <ErrorMessage>{error}</ErrorMessage>}
+        {error && <ResultContainer>{error}</ResultContainer>}
         {isLoading ? (
           <LoadingContainer>
             <LoadingSpinner />

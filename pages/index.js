@@ -236,9 +236,9 @@ const App = ({ featuredPosts = [], error = null }) => {
             브라우저가 비디오 태그를 지원하지 않습니다.
           </VideoBackground>
           <HeroContent>
-            <Header>Rich News</Header>
+            <Header>Rich <img src="/favicon.png" alt="favicon" style={{ width: '70px', height: '70px', verticalAlign: 'middle'  }} /> News</Header>
             <SubHeader>AI-Selected Latest Economic News</SubHeader>
-            <Button onClick={handleButtonClick}>주가 예측하기</Button>
+            <Button onClick={handleButtonClick}>주 가 예 측</Button>
           </HeroContent>
         </HeroSection>
         {error && <p style={{color: 'red'}}>Error: {error}</p>}
@@ -289,9 +289,7 @@ const App = ({ featuredPosts = [], error = null }) => {
       </MainContent>
       <Footer>
         <p style={{ margin: 0, textAlign: 'center' }}>
-          <span style={{ fontWeight: 'bold', fontSize: '20px' }}>© RunBuild 2024  <a href="https://open.kakao.com/me/runbuild" target="_blank" rel="noopener noreferrer">
-            <FontAwesomeIcon icon={faComment} />
-          </a>All Rights Reserved.</span>
+          <span style={{ fontWeight: 'bold', fontSize: '20px' }}>© 2024RunBuild</span>
         
           <a href="https://www.youtube.com/@runbuild" target="_blank" rel="noopener noreferrer">
             <FontAwesomeIcon icon={faYoutube} />
