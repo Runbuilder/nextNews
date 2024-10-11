@@ -2,8 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import Swal from 'sweetalert2';
 
-// pastelColors 배열은 이제 사용하지 않으므로 제거합니다.
-
 const CardContainer = styled.div`
   width: 100%;
   max-width: 300px;
@@ -12,19 +10,16 @@ const CardContainer = styled.div`
   padding: 16px;
   text-align: center;
   cursor: pointer;
-  background-color: ${props => props.$backgroundColor || '#FFFFFF'}; // 기본값으로 흰색 설정
+  background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
   position: relative;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
   }
-
   @media (min-width: 768px) {
     width: calc(50% - 20px);
   }
-
   @media (min-width: 1024px) {
     width: calc(25% - 20px);
   }
@@ -59,14 +54,12 @@ const CardDate = styled.p`
 `;
 
 const formatDate = (dateString) => {
-  // 입력된 날짜 문자열에서 연도, 월, 일을 추출합니다.
   const match = dateString.match(/(\d{4})(\d{2})\.(\d{2})/);
   if (match) {
     const [, year, month, day] = match;
     return `${year}.${month}.${day}`;
   }
   
-  // 기존 형식에 맞지 않는 경우, 원래의 formatDate 로직을 사용합니다.
   const date = new Date(dateString);
   if (isNaN(date.getTime())) {
     return '날짜 없음';
@@ -79,13 +72,13 @@ const formatDate = (dateString) => {
   return `${year}.${month}.${day}`;
 };
 
-const Card = ({ image, title, date, content, source, category, backgroundColor }) => {
-  const categoryColor = `hsl(${Math.random() * 360}, 70%, 30%)`; // 카테고리 색상은 여전히 랜덤으로 설정
+const Card = ({ image, title, date, content, source, category }) => {
+  const categoryColor = `hsl(${Math.random() * 360}, 70%, 30%)`;
 
   const handleCardClick = () => {
     Swal.fire({
       title: title,
-      html: `<div style="font-size: 1.3em; max-width: 90vw; overflow: auto;  text-align: left;white-space: pre-wrap;">${content}</div>`,
+      html: `<div style="font-size: 1.3em; max-width: 90vw; overflow: auto; text-align: left;white-space: pre-wrap;">${content}</div>`,
       showCancelButton: true,
       cancelButtonText: "닫기",
       confirmButtonText: "뉴스기사",
@@ -105,7 +98,7 @@ const Card = ({ image, title, date, content, source, category, backgroundColor }
   };
 
   return (
-    <CardContainer $backgroundColor={backgroundColor} onClick={handleCardClick}>
+    <CardContainer onClick={handleCardClick}>
       <CategoryTag color={categoryColor}>{category}</CategoryTag>
       <CardImage>{image}</CardImage>
       <CardTitle>{title}</CardTitle>
