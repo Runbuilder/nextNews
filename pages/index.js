@@ -1,7 +1,138 @@
-import React, { useState, useRef, useEffect } from 'react';
-import styled, { keyframes } from 'styled-components';
+import React, { useState, useEffect } from 'react';
+import styled, { createGlobalStyle } from 'styled-components';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import Card from '../components/Card';
+import StockPrediction from '../components/StockPrediction';
+import moneyImage from '@/public/money.jpg'; // 이미지 경로를 정확히 지정해주세요
+import LoadingSpinner from '../components/LoadingSpinner';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGlobe, faUser, faComment, faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
+import { faYoutube } from '@fortawesome/free-brands-svg-icons';
 
-const API_URL = 'https://openai.highbuff.com/';
+// 전역 스타일 정의
+const GlobalStyle = createGlobalStyle`
+  body {
+    background-color: ${({ theme }) => (theme === 'dark' ? '#333' : '#fff')};
+    color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')};
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+`;
+
+const MainContent = styled.div`
+  flex: 1 0 auto;
+  padding: 20px;
+  text-align: center;
+`;
+
+const HeroSection = styled.div`
+  background-image: url(${moneyImage.src});
+  background-size: cover;
+  background-position: center;
+  padding: 50px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  color: white; // 모든 텍스트 색상을 색으로 변경
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5); // 텍트 가독성을 위한 그림자 추가
+`;
+
+const Header = styled.h1`
+  font-size: 3.5em;
+  margin: 0;
+  color: white;
+  font-weight: 700;
+`;
+
+const SubHeader = styled.p`
+  font-size: 1.2em;
+  margin: 10px 0;
+  color: white; // 명시적으로 흰색 지정
+`;
+
+const Button = styled.button`
+  background-color: #FF4136;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 15px 30px;
+  cursor: pointer;
+  font-size: 1.2em;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  &:hover {
+    background-color: #E7261F;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+  }
+`;
+
+const PostsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding : 20px;
+  gap: 20px;
+  margin-bottom: 20px;
+`;
+
+const SectionTitle = styled.h2`
+  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')}; // 테마에 따른 색상 변경
+  margin-top: 30px;
+  margin-bottom: 1px;
+  font-size: 2.1em;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+`;
+
+const Footer = styled.footer`
+  padding: 20px;
+  text-align: center;
+  flex-shrink: 0;
+  color: #ffffff;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+
+  a {
+    color: #ffffff;
+    margin: 0 10px;
+    font-size: 24px;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #cccccc;
+    }
+  }
+`;
+
+const ThemeSwitch = styled.div`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: ${({ theme }) => (theme === 'dark' ? '#444' : '#ddd')};
+  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')};
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 24px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+`;
+
+const LoadingMessage = styled.p`
+  text-align: center;
+  font-size: 1.2em;
+  color: #666;
+`;
 
 const Overlay = styled.div`
   position: fixed;
@@ -10,309 +141,167 @@ const Overlay = styled.div`
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const PopupContent = styled.div`
-  background-color: ${({ theme }) => (theme === 'dark' ? '#444' : 'white')}; // 테마에 따른 배경색
-  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')}; // 테마에 따른 글자색
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
-  width: 90%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-`;
-
-const PopupContainer = styled.div`
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
   z-index: 1000;
-  width: 90%;
-  max-width: 800px;
-  text-align: center;
-  box-sizing: border-box;
-  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')}; // 테마에 따른 글자색
-
-  @media (max-width: 768px) {
-    width: 95%;
-    padding: 20px;
-  }
 `;
 
-const Title = styled.h2`
-  color: #333;
-  font-size: 4.5rem; // 크기를 더 크게 조정
-  margin-bottom: 3px;
-  text-align: center; // 가운데 정렬
-  font-weight: bold; // 글씨를 더 굵게 (선택사항)
-  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')}; // 테마에 따른 글자색
-
-`;
-
-const InputContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-
-  @media (max-width: 480px) {
-    flex-direction: column;
-  }
-`;
-
-const Input = styled.input`
-  flex: 1;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 20px; // 폰트 크기 증가
-  max-width: 400px;
-
-  @media (max-width: 480px) {
-    width: 100%;
-    font-size: 18px; // 모바일에서 폰트 크기 조정
-  }
-`;
-
-const AnalyzeButton = styled.button`
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  white-space: nowrap;
-
-  &:hover {
-    background-color: #45a049;
-  }
-`;
-
-const CloseButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: #ff4136;
-  border-radius: 5px;
-
-  border: none;
-  font-size: 30px;
-  cursor: pointer;
-  color: #ffffff;
-`;
-
-const ResultContainer = styled.div`
-  margin-top: 20px;
-  padding: 15px;
-  background-color: #f0f0f0;
-  border-radius: 5px;
-  font-size: 18px;
-  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')}; // 테마에 따른 글자색
-
-`;
-
-const spin = keyframes`
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-`;
-
-const LoadingSpinner = styled.div`
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid #3498db;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: ${spin} 1s linear infinite;
-  margin: 20px auto;
-`;
-
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-`;
-
-const Button = styled.button`
-  background-color: #4CAF50;
-  color: white;
-  padding: 15px 25px; // 패딩 증가
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 20px; // 폰트 크기 증가
-  white-space: nowrap;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #45a049;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 18px; // 모바일에서 폰트 크기 조정
-    padding: 12px 20px; // 모바일에서 패딩 조정
-  }
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 15px; // 버튼 간격 증가
-  margin-top: 20px;
-
-  @media (max-width: 480px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
-`;
-
-const PredictButton = styled(Button)`
-  background-color: #FF4136;
-  &:hover {
-    background-color: #E7261F;
-  }
-`;
-
-const StockPrediction = ({ onClose, theme }) => {
-  const [stockName, setStockName] = useState('');
-  const [result, setResult] = useState('');
-  const [error, setError] = useState('');
+const App = ({ featuredPosts = [], error = null }) => {
+  const [sortedPosts, setSortedPosts] = useState([]);
+  const [displayedPosts, setDisplayedPosts] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [showPrediction, setShowPrediction] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const popupRef = useRef(null);
+  const [theme, setTheme] = useState('light');
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (popupRef.current && !popupRef.current.contains(event.target)) {
-        onClose();
-      }
-    };
+    const sorted = [...featuredPosts].sort((a, b) => new Date(b.날짜) - new Date(a.날짜));
+    setSortedPosts(sorted);
+    setDisplayedPosts(sorted.slice(0, 10)); // 초기에 더 많은 포스트를 표시
+    setHasMore(sorted.length > 10);
+  }, [featuredPosts]);
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [onClose]);
+  const handleButtonClick = () => {
+    setShowPrediction(true);
+  };
 
-  const getStockForecast = async () => {
-    if (!stockName) {
-      setError("종목명을 입력해주세요.");
+  const handleClosePrediction = () => {
+    setShowPrediction(false);
+  };
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+  };
+
+  // 추천 뉴스도 날짜순으로 정렬
+  const recommendedPosts = sortedPosts
+    .filter(post => post.추천 === true)
+    .sort((a, b) => new Date(b.날짜) - new Date(a.날짜));
+
+  const fetchMoreData = () => {
+    if (displayedPosts.length >= sortedPosts.length) {
+      setHasMore(false);
       return;
     }
-
+    
     setIsLoading(true);
-    setError('');
-    setResult('');
-
-    try {
-      const response = await fetch(`${API_URL}?method=portfolioAI&name=${encodeURIComponent(stockName)}`);
-      const data = await response.text();
-
-      if (data && data.startsWith('https://')) {
-        setResult(`
-          <h3>${stockName} 예측 차트</h3>
-          <img src="${data}" alt="${stockName} 예측 차트" style="max-width: 100%; height: auto;" />
-          <p>1) 장 거래 시간에만 예측 그래프가 표기되며, <strong>장외 시간에는 현재 시세 그래프만 표기</strong>됩니다.</p>
-          <p>2) 예측 가능한 시간은 현시점에서 1분~5분 이내입니다. <strong>예측 성공률은 보장하지 않으며, 매수 매도 전에 참고용으로만 활용</strong>하시길 바랍니다.</p>
-          <p>3) 예측 결과에 따라 사람이 직접 추격 매수 및 손절 할 경우, 매매 시간 지연에 따라 손실이 발생할 수 있으며, 시간 지연 문제에 도움을 받기 위해선 <a href="https://highbuff.com/person" target="_blank">HIGHBUFF AI</a> 서비스를 무료 체험해 보시길 바랍니다.</p>
-          <p>4) 이 정보를 활용한 투자 책임은 본인에게 있으며, 자세한 알고리즘 및 기술에 관련된 자세한 정보는 <a href="https://highbuff.com/person" target="_blank">HIGHBUFF AI</a>에서 확인 가능합니다.</p>
-        `);
-      } else {
-        setError(`${stockName}에 대한 예측 차트를 생성하기 위한 데이터가 충분하지 않습니다. 다른 종목을 입력해 주시기 바랍니다.`);
-      }
-    } catch (error) {
-      handleError(error);
-    } finally {
+    setTimeout(() => {
+      setDisplayedPosts(prevPosts => [
+        ...prevPosts,
+        ...sortedPosts.slice(prevPosts.length, prevPosts.length + 10)
+      ]);
       setIsLoading(false);
-    }
-  };
-
-  const getMarketCap = async (market) => {
-    setIsLoading(true);
-    setError('');
-    setResult('');
-
-    try {
-      const response = await fetch(`${API_URL}?method=marketCap`);
-      const data = await response.json();
-
-      let html = `<h3>${market} 시가총액 순위</h3>`;
-
-      if (data[market.toLowerCase()]) {
-        html += createMarketCapTable(data[market.toLowerCase()]);
-        html += '<p>위 종목 중 예측 차트를 보고 싶은 종목이 있다면 종목명을 입력해주세요.</p>';
-      } else {
-        html += `<p>${market} 시가총액 데이터를 불러오지 못했습니다.</p>`;
-      }
-
-      setResult(html);
-    } catch (error) {
-      handleError(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const createMarketCapTable = (data) => {
-    let html = '<table style="width:100%; border-collapse: collapse;"><tr><th style="border: 1px solid #ddd; padding: 8px;">순위</th><th style="border: 1px solid #ddd; padding: 8px;">종목</th><th style="border: 1px solid #ddd; padding: 8px;">코드</th><th style="border: 1px solid #ddd; padding: 8px;">시가총액</th></tr>';
-    data.forEach((item, index) => {
-      html += `<tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">${index + 1}</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">${item.name}</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">${item.code}</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">${parseInt(item.marketCap).toLocaleString()}</td>
-      </tr>`;
-    });
-    html += '</table>';
-    return html;
-  };
-
-  const handleError = (error) => {
-    console.error('Error:', error);
-    setError("조회중 오류가 발생했습니다. 다시 시도해주세요.");
+    }, 500);
   };
 
   return (
-    <Overlay>
-      <PopupContent ref={popupRef} theme={theme}>
-        <CloseButton onClick={onClose}>&times;</CloseButton>
-        <Title>🧙‍♂️</Title>
-        <InputContainer>
-          <Input 
-            type="text" 
-            placeholder="종목명을 입력하세요" 
-            value={stockName} 
-            onChange={(e) => setStockName(e.target.value)}
-          />
-          <PredictButton onClick={getStockForecast}>예측 차트 보기</PredictButton>
-        </InputContainer>
-        <ButtonContainer>
-          <Button onClick={() => getMarketCap('KOSPI')}>KOSPI 시가총액</Button>
-          <Button onClick={() => getMarketCap('KOSDAQ')}>KOSDAQ 시가총액</Button>
-        </ButtonContainer>
-        {error && <ErrorMessage>{error}</ErrorMessage>}
-        {isLoading ? (
-          <LoadingContainer>
-            <LoadingSpinner />
-          </LoadingContainer>
-        ) : (
-          result && <ResultContainer dangerouslySetInnerHTML={{ __html: result }} />
-        )}
-      </PopupContent>
-    </Overlay>
+    <>
+      <GlobalStyle theme={theme} />
+      <MainContent>
+        <HeroSection>
+          <Header>Rich News</Header>
+          <SubHeader>AI-Selected Latest Economic News</SubHeader>
+          <Button onClick={handleButtonClick}>📈📉주가예측</Button>
+        </HeroSection>
+        {error && <p style={{color: 'red'}}>Error: {error}</p>}
+        <SectionTitle theme={theme}>Featured Posts</SectionTitle>
+        <PostsContainer>
+          {recommendedPosts.length > 0 ? (
+            recommendedPosts.map((post, index) => (
+              <Card 
+                key={index}
+                image={post.이모지}
+                title={post.제목}
+                date={post.날짜}
+                content={post.내용}
+                source={post.출처}
+                category={post.카테고리}
+                backgroundColor={post.색상} // 새로 추가된 색상 정보
+                theme={theme} // theme prop 추가
+              />
+            ))
+          ) : (
+            <p>추천 뉴스가 없습니다.</p>
+          )}
+        </PostsContainer>
+        <SectionTitle theme={theme}>Most Recent</SectionTitle>
+        <InfiniteScroll
+          dataLength={displayedPosts.length}
+          next={fetchMoreData}
+          hasMore={hasMore}
+          loader={isLoading && <LoadingSpinner />}
+          scrollThreshold={0.9}
+        >
+          <PostsContainer>
+            {displayedPosts.map((post, index) => (
+              <Card 
+                key={index}
+                image={post.이모지}
+                title={post.제목}
+                date={post.날짜}
+                content={post.내용}
+                source={post.출처}
+                category={post.카테고리}
+                backgroundColor={post.색상} // 새로 추가된 색상 정보
+                theme={theme} // theme prop 추가
+              />
+            ))}
+          </PostsContainer>
+        </InfiniteScroll>
+      </MainContent>
+      <Footer>
+        <p style={{ margin: 0, textAlign: 'center' }}>
+          <span style={{ fontWeight: 'bold', fontSize: '20px' }}>© RunBuild 2024<a href="https://open.kakao.com/me/runbuild" target="_blank" rel="noopener noreferrer">
+            <FontAwesomeIcon icon={faComment} />
+          </a>All Rights Reserved.</span>
+          
+          <a href="https://www.youtube.com/@runbuild" target="_blank" rel="noopener noreferrer">
+            <FontAwesomeIcon icon={faYoutube} />
+          </a>
+        </p>
+      </Footer>
+      <ThemeSwitch theme={theme} onClick={toggleTheme}>
+        <FontAwesomeIcon icon={theme === 'light' ? faMoon : faSun} />
+      </ThemeSwitch>
+      {showPrediction && (
+        <Overlay>
+          <StockPrediction onClose={handleClosePrediction} theme={theme}/>
+        </Overlay>
+      )}
+    </>
   );
 };
 
-export default StockPrediction;
+export async function getStaticProps() {
+  const scriptUrl = 'https://script.google.com/macros/s/AKfycbw6X_4heyrpjFoxkImtzSYTZGu8Ued9Gn-vekIjbKgpwURLOL7dtrwflF9o_TukGwMU/exec';
+  
+  try {
+    const res = await fetch(scriptUrl);
+    
+    if (!res.ok) {
+      throw new Error(`Failed to fetch data: ${res.status} ${res.statusText}`);
+    }
+
+    const text = await res.text();
+    const data = JSON.parse(text);
+
+    if (!Array.isArray(data)) {
+      throw new Error('Received data is not an array');
+    }
+
+    const featuredPosts = data;
+
+    return {
+      props: {
+        featuredPosts,
+      },
+    };
+  } catch (error) {
+    return {
+      props: {
+        featuredPosts: [],
+        error: error.message,
+      },
+    };
+  }
+}
+
+export default App;
