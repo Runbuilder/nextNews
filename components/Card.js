@@ -8,17 +8,18 @@ const CardContainer = styled.div`
   width: 100%;
   max-width: 300px;
   border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 16px;
   text-align: center;
   cursor: pointer;
   background-color: ${props => props.$backgroundColor || '#FFFFFF'}; // 기본값으로 흰색 설정
   position: relative;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2)
   }
 
   @media (min-width: 768px) {
@@ -37,7 +38,7 @@ const CategoryTag = styled.div`
   background-color: ${props => props.color};
   color: white;
   padding: 6px 12px;
-  border-radius: 4px;
+  border-radius: 20px;
   font-size: 0.9em;
   font-weight: bold;
 `;
@@ -59,19 +60,17 @@ const CardDate = styled.p`
 `;
 
 const formatDate = (dateString) => {
-  // 먼저 'Z'를 제거하고 밀리초를 잘라냅니다.
-  dateString = dateString.replace('Z', '').split('.')[0];
+  // 입력된 날짜 문자열에서 연도, 월, 일을 추출합니다.
+  const match = dateString.match(/(\d{4})(\d{2})\.(\d{2})/);
+  if (match) {
+    const [, year, month, day] = match;
+    return `${year}.${month}.${day}`;
+  }
   
+  // 기존 형식에 맞지 않는 경우, 원래의 formatDate 로직을 사용합니다.
   const date = new Date(dateString);
-  
-  // 날짜가 유효한지 확인합니다.
   if (isNaN(date.getTime())) {
-    // 유효하지 않은 경우, 원본 문자열에서 날짜 부분만 추출합니다.
-    const match = dateString.match(/(\d{4})-(\d{2})-(\d{2})/);
-    if (match) {
-      return `${match[1]}.${match[2]}.${match[3]}`;
-    }
-    return '날짜 없음'; // 날짜 형식이 완전히 다른 경우
+    return '날짜 없음';
   }
   
   const year = date.getFullYear();
