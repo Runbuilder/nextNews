@@ -14,9 +14,9 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    // background-color: #E0FFFF; // 파스텔 계열의 푸른색
+    background-color: #E0FFFF; // 파스텔 계열의 푸른색
     
-  background: linear-gradient(115deg,#2980B9, #6DD5FA,#FFFFFF);
+  // background: linear-gradient(115deg,#2980B9, #6DD5FA,#FFFFFF);
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
