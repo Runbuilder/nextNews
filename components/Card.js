@@ -85,8 +85,8 @@ const Card = ({ image, title, date, content, source, category, backgroundColor, 
 
   const handleCardClick = () => {
     Swal.fire({
-      title: `<div style="font-size: 2.3em;">${image}</div>`,
-      html: `<div style="font-size: 1.3em; max-width: 90vw; overflow: auto; text-align: left;white-space: pre-wrap; color: ${theme === 'dark' ? '#fff' : '#333'};">${content}</div>`,
+      title: title,
+      html: `<div style="font-size: 1.3em; max-width: 90vw; overflow: auto; text-align: left; white-space: pre-wrap; color: ${theme === 'dark' ? '#fff' : '#333'};">${content}</div>`,
       showCancelButton: true,
       cancelButtonText: "닫기",
       confirmButtonText: "뉴스기사",
