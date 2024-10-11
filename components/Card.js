@@ -55,7 +55,7 @@ const CardTitle = styled.h3`
 `;
 
 const CardDate = styled.p`
-  color: #bdc3c7;
+  color: #ffffff;
   font-size: 0.9em;
 `;
 
