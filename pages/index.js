@@ -88,10 +88,11 @@ const PostsContainer = styled.div`
 
 const SectionTitle = styled.h2`
   color: #333;
-  margin-top: 60px;
-  margin-bottom: 30px;
+  margin-top: 50px;
+  margin-bottom: 10px;
   font-size: 2.1em;
   font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5); // 텍트 가독성을 위한 그림자 추가
 `;
 
 const Footer = styled.footer`
