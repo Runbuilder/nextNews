@@ -9,9 +9,9 @@ const PopupContainer = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: white;
-  padding: 40px;
-  border-radius: 15px;
-  box-shadow: 0 0 30px rgba(0,0,0,0.3);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
   z-index: 1000;
   width: 90%;
   max-width: 800px;
@@ -20,24 +20,24 @@ const PopupContainer = styled.div`
 
   @media (max-width: 768px) {
     width: 95%;
-    padding: 30px;
+    padding: 20px;
   }
 `;
 
 const Title = styled.h2`
   color: #333;
-  font-size: 2.8rem;
-  margin-bottom: 40px;
-  text-align: center;
-  font-weight: 700;
+  font-size: 2.5rem; // 크기를 더 크게 조정
+  margin-bottom: 30px;
+  text-align: center; // 가운데 정렬
+  font-weight: bold; // 글씨를 더 굵게 (선택사항)
 `;
 
 const InputContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 15px;
-  margin-bottom: 30px;
+  gap: 10px;
+  margin-bottom: 20px;
 
   @media (max-width: 480px) {
     flex-direction: column;
@@ -46,63 +46,49 @@ const InputContainer = styled.div`
 
 const Input = styled.input`
   flex: 1;
-  padding: 12px;
-  border: 2px solid #ddd;
-  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
   font-size: 16px;
   max-width: 400px;
-  transition: border-color 0.3s ease;
-
-  &:focus {
-    border-color: #4CAF50;
-    outline: none;
-  }
 
   @media (max-width: 480px) {
     width: 100%;
   }
 `;
 
-const Button = styled.button`
+const AnalyzeButton = styled.button`
   background-color: #4CAF50;
   color: white;
-  padding: 12px 24px;
+  padding: 10px 20px;
   border: none;
-  border-radius: 8px;
+  border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
-  font-weight: 700;
-  transition: all 0.3s ease;
+  white-space: nowrap;
 
   &:hover {
     background-color: #45a049;
-    transform: translateY(-2px);
   }
 `;
 
 const CloseButton = styled.button`
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 10px;
+  right: 10px;
   background: none;
   border: none;
-  font-size: 28px;
+  font-size: 24px;
   cursor: pointer;
   color: #333;
-  transition: color 0.3s ease;
-
-  &:hover {
-    color: #FF4136;
-  }
 `;
 
 const ResultContainer = styled.div`
-  margin-top: 30px;
-  padding: 20px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
   font-size: 18px;
-  line-height: 1.6;
 `;
 
 const spin = keyframes`
@@ -125,6 +111,21 @@ const LoadingContainer = styled.div`
   justify-content: center;
   align-items: center;
   height: 200px;
+`;
+
+const Button = styled.button`
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: #45a049;
+  }
 `;
 
 const ButtonContainer = styled.div`
@@ -267,7 +268,7 @@ const StockPrediction = ({ onClose }) => {
     <Overlay>
       <PopupContent ref={popupRef}>
         <CloseButton onClick={onClose}>&times;</CloseButton>
-        <Title>🎢 주가 예측</Title>
+        <Title>🎢주가 예측</Title>
         <InputContainer>
           <Input 
             type="text" 
@@ -275,7 +276,7 @@ const StockPrediction = ({ onClose }) => {
             value={stockName} 
             onChange={(e) => setStockName(e.target.value)}
           />
-          <Button onClick={getStockForecast}>예측 차트 보기</Button>
+          <PredictButton onClick={getStockForecast}>예측 차트 보기</PredictButton>
         </InputContainer>
         <ButtonContainer>
           <Button onClick={() => getMarketCap('KOSPI')}>KOSPI 시가총액</Button>
