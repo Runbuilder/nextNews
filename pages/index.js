@@ -45,9 +45,10 @@ const HeroSection = styled.div`
 `;
 
 const Header = styled.h1`
-  font-size: 2.5em;
+  font-size: 3.5em;
   margin: 0;
-  color: white; // 명시적로 흰색 지정
+  color: white;
+  font-weight: 700;
 `;
 
 const SubHeader = styled.p`
@@ -57,18 +58,20 @@ const SubHeader = styled.p`
 `;
 
 const Button = styled.button`
-  background-color: #FF7F50;
+  background-color: #FF4136;
   color: white;
   border: none;
   border-radius: 5px;
-  padding: 10px 20px;
+  padding: 15px 30px;
   cursor: pointer;
-  font-size: 1em;
-  transition: background-color 0.3s ease;
-  margin-top: 20px; // 버튼과 텍스트 사이 간격 추가
-
+  font-size: 1.2em;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   &:hover {
-    background-color: #FF6347;
+    background-color: #E7261F;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
   }
 `;
 
@@ -80,37 +83,12 @@ const PostsContainer = styled.div`
   margin-bottom: 20px;
 `;
 
-const Navigation = styled.nav`
-  background-color: rgba(255, 255, 255, 0.8);
-  padding: 10px 0;
-  margin-bottom: 20px;
-  border-radius: 8px;
-`;
-
-const NavList = styled.ul`
-  list-style-type: none;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-`;
-
-const NavItem = styled.li`
-  cursor: pointer;
-  padding: 5px 10px;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-`;
-
 const SectionTitle = styled.h2`
   color: #333;
-  margin-top: 40px;
-  margin-bottom: 20px;
+  margin-top: 60px;
+  margin-bottom: 30px;
+  font-size: 2.1em;
+  font-weight: 700;
 `;
 
 const Footer = styled.footer`
@@ -184,22 +162,12 @@ const App = ({ featuredPosts = [], error = null }) => {
       <GlobalStyle />
       <MainContent>
         <HeroSection>
-          <Header>부자뉴스</Header>
-          <SubHeader>AI가 선별한 최신 경제 뉴스</SubHeader>
+          <Header>Rich News</Header>
+          <SubHeader>AI-Selected Latest Economic News</SubHeader>
           <Button onClick={handleButtonClick}>주가 예측하기</Button>
         </HeroSection>
-        <Navigation>
-          <NavList>
-            <NavItem>Nature</NavItem>
-            <NavItem>Photography</NavItem>
-            <NavItem>Relaxation</NavItem>
-            <NavItem>Vacation</NavItem>
-            <NavItem>Travel</NavItem>
-            <NavItem>Adventure</NavItem>
-          </NavList>
-        </Navigation>
         {error && <p style={{color: 'red'}}>Error: {error}</p>}
-        <SectionTitle>추천뉴스</SectionTitle>
+        <SectionTitle>Featured Posts</SectionTitle>
         <PostsContainer>
           {recommendedPosts.length > 0 ? (
             recommendedPosts.map((post, index) => (
@@ -218,7 +186,7 @@ const App = ({ featuredPosts = [], error = null }) => {
             <p>추천 뉴스가 없습니다.</p>
           )}
         </PostsContainer>
-        <SectionTitle>부자뉴스</SectionTitle>
+        <SectionTitle>Most Recent</SectionTitle>
         <InfiniteScroll
           dataLength={displayedPosts.length}
           next={fetchMoreData}
