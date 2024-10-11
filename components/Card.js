@@ -80,18 +80,19 @@ const formatDate = (dateString) => {
   return `${year}.${month}.${day}`;
 };
 
-const Card = ({ image, title, date, content, source, category, backgroundColor }) => {
+const Card = ({ image, title, date, content, source, category, backgroundColor, theme }) => {
   const categoryColor = `hsl(${Math.random() * 360}, 70%, 30%)`; // 카테고리 색상은 여전히 랜덤으로 설정
 
   const handleCardClick = () => {
     Swal.fire({
-      title: title,
-      html: `<div style="font-size: 1.3em; max-width: 90vw; overflow: auto;  text-align: left;white-space: pre-wrap;">${content}</div>`,
+      title: `<div style="font-size: 2.3em;">${image}</div>`,
+      html: `<div style="font-size: 1.3em; max-width: 90vw; overflow: auto; text-align: left;white-space: pre-wrap; color: ${theme === 'dark' ? '#fff' : '#333'};">${content}</div>`,
       showCancelButton: true,
       cancelButtonText: "닫기",
       confirmButtonText: "뉴스기사",
       width: 'auto',
       maxWidth: '90%',
+      background: theme === 'dark' ? '#333' : '#fff', // 팝업 배경색 설정
       customClass: {
         container: 'custom-swal-container',
         popup: 'custom-swal-popup',
