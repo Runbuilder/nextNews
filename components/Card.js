@@ -12,8 +12,7 @@ const CardContainer = styled.div`
   padding: 16px;
   text-align: center;
   cursor: pointer;
-  // background-color: ${props => props.$backgroundColor || '#FFFFFF'}; // 기본값으로 흰색 설정
-  background: linear-gradient(115deg,#2980B9, #6DD5FA,#FFFFFF);
+  background-color: ${props => props.$backgroundColor || '#FFFFFF'}; // 기본값으로 흰색 설정
   position: relative;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
@@ -51,11 +50,11 @@ const CardImage = styled.div`
 const CardTitle = styled.h3`
   margin: 8px 0;
   font-size: 1.2em;
-  color: #333;
+  color: #ffffff;
 `;
 
 const CardDate = styled.p`
-  color: #666;
+  color: #ffffff;
   font-size: 0.9em;
 `;
 
