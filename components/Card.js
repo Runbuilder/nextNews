@@ -6,18 +6,27 @@ import Swal from 'sweetalert2';
 
 const CardContainer = styled.div`
   width: 100%;
-  border-radius: 12px;
-  padding: 24px;
+  max-width: 300px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
   text-align: center;
   cursor: pointer;
-  background: linear-gradient(135deg, #E0F7FA, #B3E5FC);
+  background-color: ${props => props.$backgroundColor || '#FFFFFF'}; // 기본값으로 흰색 설정
   position: relative;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+
+  @media (min-width: 768px) {
+    width: calc(50% - 20px);
+  }
+
+  @media (min-width: 1024px) {
+    width: calc(25% - 20px);
   }
 `;
 
@@ -25,10 +34,10 @@ const CategoryTag = styled.div`
   position: absolute;
   top: 12px;
   left: 12px;
-  background-color: ${props => props.backgroundColor || '#4CAF50'};
+  background-color: ${props => props.color};
   color: white;
   padding: 6px 12px;
-  border-radius: 20px;
+  border-radius: 4px;
   font-size: 0.9em;
   font-weight: bold;
 `;
@@ -39,16 +48,14 @@ const CardImage = styled.div`
 `;
 
 const CardTitle = styled.h3`
-  margin: 12px 0;
-  font-size: 1.3em;
+  margin: 8px 0;
+  font-size: 1.2em;
   color: #333;
-  font-weight: 700;
 `;
 
 const CardDate = styled.p`
   color: #666;
   font-size: 0.9em;
-  font-weight: 300;
 `;
 
 const formatDate = (dateString) => {
@@ -98,8 +105,8 @@ const Card = ({ image, title, date, content, source, category, backgroundColor }
   };
 
   return (
-    <CardContainer onClick={handleCardClick}>
-      <CategoryTag backgroundColor={backgroundColor}>{category}</CategoryTag>
+    <CardContainer $backgroundColor={backgroundColor} onClick={handleCardClick}>
+      <CategoryTag color={categoryColor}>{category}</CategoryTag>
       <CardImage>{image}</CardImage>
       <CardTitle>{title}</CardTitle>
       <CardDate>{formatDate(date)}</CardDate>
