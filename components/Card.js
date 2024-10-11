@@ -85,7 +85,7 @@ const Card = ({ image, title, date, content, source, category, backgroundColor, 
 
   const handleCardClick = () => {
     Swal.fire({
-      title: title,
+      title: `<span style="font-size: 3.1em; text-align: center;">${image}</span>`,
       html: `<div style="font-size: 1.3em; max-width: 90vw; overflow: auto; text-align: left; white-space: pre-wrap; color: ${theme === 'dark' ? '#fff' : '#333'};">${content}</div>`,
       showCancelButton: true,
       cancelButtonText: "닫기",

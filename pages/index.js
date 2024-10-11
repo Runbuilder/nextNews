@@ -3,8 +3,6 @@ import styled, { createGlobalStyle } from 'styled-components';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Card from '../components/Card';
 import StockPrediction from '../components/StockPrediction';
-import moneyImage from '@/public/money.jpg';
-import LoadingSpinner from '../components/LoadingSpinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGlobe, faUser, faComment, faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
 import { faYoutube } from '@fortawesome/free-brands-svg-icons';
@@ -37,14 +35,30 @@ const MainContent = styled.div`
 `;
 
 const HeroSection = styled.div`
-  background-image: url(${moneyImage.src});
-  background-size: cover;
-  background-position: center;
+  position: relative;
   padding: 50px 20px;
   border-radius: 8px;
   margin-bottom: 20px;
   color: white;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  overflow: hidden;
+`;
+
+const VideoBackground = styled.video`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translateX(-50%) translateY(-50%);
+  z-index: -1;
+`;
+
+const HeroContent = styled.div`
+  position: relative;
+  z-index: 1;
 `;
 
 const Header = styled.h1`
@@ -217,9 +231,15 @@ const App = ({ featuredPosts = [], error = null }) => {
       <GlobalStyle theme={theme} />
       <MainContent>
         <HeroSection>
-          <Header>Rich News</Header>
-          <SubHeader>AI-Selected Latest Economic News</SubHeader>
-          <Button onClick={handleButtonClick}>주가 예측하기</Button>
+          <VideoBackground autoPlay loop muted playsInline>
+            <source src="/video.mp4" type="video/mp4" />
+            브라우저가 비디오 태그를 지원하지 않습니다.
+          </VideoBackground>
+          <HeroContent>
+            <Header>Rich News</Header>
+            <SubHeader>AI-Selected Latest Economic News</SubHeader>
+            <Button onClick={handleButtonClick}>주가 예측하기</Button>
+          </HeroContent>
         </HeroSection>
         {error && <p style={{color: 'red'}}>Error: {error}</p>}
         <SectionTitle theme={theme}>Featured Posts</SectionTitle>
