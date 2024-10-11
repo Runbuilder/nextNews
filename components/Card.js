@@ -18,8 +18,8 @@ const CardContainer = styled.div`
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 
   &:hover {
-    transform: translateY(-3px);translateX(-3px)
-    box-shadow: 0 8px 15px rgba(0,0,0,0.2)
+    transform: translateY(-3px) translateX(-3px) scale(1.05);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
   }
 
   @media (min-width: 768px) {
