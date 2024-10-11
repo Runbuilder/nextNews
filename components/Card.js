@@ -13,7 +13,7 @@ const CardContainer = styled.div`
   text-align: center;
   cursor: pointer;
   // background-color: ${props => props.$backgroundColor || '#FFFFFF'}; // 기본값으로 흰색 설정
-  background: linear-gradient(115deg, #c2e59c, #64b3f4);
+  background: linear-gradient(115deg, #4e54c8, #8f94fb);
   position: relative;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
