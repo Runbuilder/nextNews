@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle, keyframes } from 'styled-components';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Card from '../components/Card';
 import StockPrediction from '../components/StockPrediction';
@@ -42,9 +42,6 @@ const HeroSection = styled.div`
   color: white;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   overflow: hidden;
-  background-image: url('/money.jpg');
-  background-size: cover;
-  background-position: center;
 `;
 
 const VideoBackground = styled.video`
@@ -57,8 +54,6 @@ const VideoBackground = styled.video`
   height: auto;
   transform: translateX(-50%) translateY(-50%);
   z-index: -1;
-  opacity: ${props => props.isLoaded ? 1 : 0};
-  transition: opacity 0.5s ease-in-out;
 `;
 
 const HeroContent = styled.div`
@@ -184,6 +179,22 @@ const Layout = styled.div`
   min-height: 100vh;
 `;
 
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+`;
+
+const LoadingSpinner = styled.div`
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: ${spin} 1s linear infinite;
+  margin: 20px auto;
+`;
+
+
 const App = ({ featuredPosts = [], error = null }) => {
   const [sortedPosts, setSortedPosts] = useState([]);
   const [displayedPosts, setDisplayedPosts] = useState([]);
@@ -191,7 +202,6 @@ const App = ({ featuredPosts = [], error = null }) => {
   const [showPrediction, setShowPrediction] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [theme, setTheme] = useState('light');
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
   useEffect(() => {
     const sorted = [...featuredPosts].sort((a, b) => new Date(b.날짜) - new Date(a.날짜));
@@ -232,23 +242,12 @@ const App = ({ featuredPosts = [], error = null }) => {
     }, 500);
   };
 
-  const handleVideoLoad = () => {
-    setIsVideoLoaded(true);
-  };
-
   return (
     <Layout>
       <GlobalStyle theme={theme} />
       <MainContent>
         <HeroSection>
-          <VideoBackground 
-            autoPlay 
-            loop 
-            muted 
-            playsInline
-            onLoadedData={handleVideoLoad}
-            isLoaded={isVideoLoaded}
-          >
+          <VideoBackground autoPlay loop muted playsInline>
             <source src="/video.mp4" type="video/mp4" />
             브라우저가 비디오 태그를 지원하지 않습니다.
           </VideoBackground>
