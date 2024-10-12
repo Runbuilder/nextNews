@@ -248,6 +248,7 @@ const App = ({ featuredPosts = [], error = null }) => {
             recommendedPosts.map((post, index) => (
               <Card 
                 key={index}
+                id={post.id} // 추가: 각 포스트의 고유 ID
                 image={post.이모지}
                 title={post.제목}
                 date={post.날짜}
@@ -255,7 +256,9 @@ const App = ({ featuredPosts = [], error = null }) => {
                 source={post.출처}
                 category={post.카테고리}
                 backgroundColor={post.색상}
-                theme={theme} // theme prop 추가
+                theme={theme}
+                views={post.조회수} // 추가: 조회수
+                likes={post.좋아요} // 추가: 좋아요 수
               />
             ))
           ) : (
@@ -274,6 +277,7 @@ const App = ({ featuredPosts = [], error = null }) => {
             {displayedPosts.map((post, index) => (
               <Card 
                 key={index}
+                id={post.id} // 추가: 각 포스트의 고유 ID
                 image={post.이모지}
                 title={post.제목}
                 date={post.날짜}
@@ -281,7 +285,9 @@ const App = ({ featuredPosts = [], error = null }) => {
                 source={post.출처}
                 category={post.카테고리}
                 backgroundColor={post.색상}
-                theme={theme} // theme prop 추가
+                theme={theme}
+                views={post.조회수} // 추가: 조회수
+                likes={post.좋아요} // 추가: 좋아요 수
               />
             ))}
           </PostsContainer>
@@ -301,7 +307,7 @@ const App = ({ featuredPosts = [], error = null }) => {
       </ThemeSwitch>
       {showPrediction && (
         <Overlay>
-          <StockPrediction onClose={handleClosePrediction} theme={theme} /> {/* theme prop 추가 */}
+          <StockPrediction onClose={handleClosePrediction} theme={theme} />
         </Overlay>
       )}
     </Layout>
@@ -309,7 +315,7 @@ const App = ({ featuredPosts = [], error = null }) => {
 };
 
 export async function getStaticProps() {
-  const scriptUrl = 'https://script.google.com/macros/s/AKfycbw6X_4heyrpjFoxkImtzSYTZGu8Ued9Gn-vekIjbKgpwURLOL7dtrwflF9o_TukGwMU/exec';
+  const scriptUrl = 'https://script.google.com/macros/s/AKfycbxLtGd_RsGvsLrEvtDHsbaeEq7YnLzn8GzDV3UAQaEKESODls8UJQX70p-rJbKSfSXE/exec?action=getData';
   
   try {
     const res = await fetch(scriptUrl);
@@ -318,8 +324,7 @@ export async function getStaticProps() {
       throw new Error(`Failed to fetch data: ${res.status} ${res.statusText}`);
     }
 
-    const text = await res.text();
-    const data = JSON.parse(text);
+    const data = await res.json();
 
     if (!Array.isArray(data)) {
       throw new Error('Received data is not an array');
