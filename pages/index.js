@@ -62,7 +62,7 @@ const HeroContent = styled.div`
 `;
 
 const Header = styled.h1`
-  font-size: 3.5em;
+  font-size: 2.8em;
   margin: 0;
   color: white;
   font-weight: 700;
@@ -75,13 +75,13 @@ const SubHeader = styled.p`
 `;
 
 const Button = styled.button`
-  background-color: #FF4136;
+  background-color: #ff4136;
   color: white;
   border: none;
-  border-radius: 5px;
-  padding: 15px 30px;
+  border-radius: 25px;
+  padding: 10px 20px;
   cursor: pointer;
-  font-size: 1.2em;
+  font-size: 1.3em;
   font-weight: 700;
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -102,7 +102,7 @@ const PostsContainer = styled.div`
 `;
 
 const SectionTitle = styled.h2`
-  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')};
+  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333333')};
   margin-top: 30px;
   margin-bottom: 1px;
   font-size: 2.1em;
@@ -341,6 +341,7 @@ export async function getStaticProps() {
     }
 
     const data = await res.json();
+    console.log('원본 데이터:', JSON.stringify(data, null, 2));
 
     if (!Array.isArray(data)) {
       throw new Error('Received data is not an array');
