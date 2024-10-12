@@ -42,6 +42,9 @@ const HeroSection = styled.div`
   color: white;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   overflow: hidden;
+  background-image: url('/money.jpg');
+  background-size: cover;
+  background-position: center;
 `;
 
 const VideoBackground = styled.video`
@@ -54,6 +57,8 @@ const VideoBackground = styled.video`
   height: auto;
   transform: translateX(-50%) translateY(-50%);
   z-index: -1;
+  opacity: ${props => props.isLoaded ? 1 : 0};
+  transition: opacity 0.5s ease-in-out;
 `;
 
 const HeroContent = styled.div`
@@ -186,6 +191,7 @@ const App = ({ featuredPosts = [], error = null }) => {
   const [showPrediction, setShowPrediction] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [theme, setTheme] = useState('light');
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
   useEffect(() => {
     const sorted = [...featuredPosts].sort((a, b) => new Date(b.날짜) - new Date(a.날짜));
@@ -226,12 +232,23 @@ const App = ({ featuredPosts = [], error = null }) => {
     }, 500);
   };
 
+  const handleVideoLoad = () => {
+    setIsVideoLoaded(true);
+  };
+
   return (
     <Layout>
       <GlobalStyle theme={theme} />
       <MainContent>
         <HeroSection>
-          <VideoBackground autoPlay loop muted playsInline>
+          <VideoBackground 
+            autoPlay 
+            loop 
+            muted 
+            playsInline
+            onLoadedData={handleVideoLoad}
+            isLoaded={isVideoLoaded}
+          >
             <source src="/video.mp4" type="video/mp4" />
             브라우저가 비디오 태그를 지원하지 않습니다.
           </VideoBackground>
