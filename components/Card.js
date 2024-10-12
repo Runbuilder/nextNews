@@ -50,11 +50,19 @@ const CardTitle = styled.h3`
   margin: 8px 0;
   font-size: 1.2em;
   color: #ffffff;
+  flex-grow: 1;
 `;
 
 const CardDate = styled.p`
+  position: absolute;
+  top: 12px;
+  right: 12px;
   color: #ffffff;
-  font-size: 0.9em;
+  font-size: 0.8em;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 4px 8px;
+  border-radius: 12px;
+  margin: 0;
 `;
 
 const CardStats = styled.div`
@@ -85,6 +93,12 @@ const formatDate = (dateString) => {
   
   return `${year}.${month}.${day}`;
 };
+
+const CardContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;
 
 const Card = ({ id, image, title, date, content, source, category, backgroundColor, theme, views, likes }) => {
   const [currentLikes, setCurrentLikes] = useState(likes);
@@ -180,13 +194,15 @@ const Card = ({ id, image, title, date, content, source, category, backgroundCol
   return (
     <CardContainer $backgroundColor={backgroundColor} onClick={handleCardClick}>
       <CategoryTag color={categoryColor}>{category}</CategoryTag>
-      <CardImage>{image}</CardImage>
-      <CardTitle>{title}</CardTitle>
       <CardDate>{formatDate(date)}</CardDate>
-      <CardStats>
-        <span>조회수: {currentViews}</span>
-        <span>좋아요: {currentLikes}</span>
-      </CardStats>
+      <CardContent>
+        <CardImage>{image}</CardImage>
+        <CardTitle>{title}</CardTitle>
+        <CardStats>
+          <span>👀: {currentViews}</span>
+          <span>👍: {currentLikes}</span>
+        </CardStats>
+      </CardContent>
     </CardContainer>
   );
 };
