@@ -254,7 +254,7 @@ const App = ({ featuredPosts = [], error = null }) => {
           <HeroContent>
             <Header>Rich <img src="/favicon.png" alt="favicon" style={{ width: '70px', height: '70px', verticalAlign: 'middle'  }} /> News</Header>
             <SubHeader>AI-Selected Latest Economic News</SubHeader>
-            <Button onClick={handleButtonClick}>주 가 예 측</Button>
+            {/* <Button onClick={handleButtonClick}>주 가 예 측</Button> */}
           </HeroContent>
         </HeroSection>
         {error && <p style={{color: 'red'}}>Error: {error}</p>}
