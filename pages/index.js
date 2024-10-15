@@ -222,9 +222,13 @@ const App = ({ featuredPosts = [], error = null }) => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
+  // const recommendedPosts = sortedPosts
+  //   .filter(post => post.추천 === true)
+  //   .sort((a, b) => new Date(b.날짜) - new Date(a.날짜));
   const recommendedPosts = sortedPosts
-    .filter(post => post.추천 === true)
-    .sort((a, b) => new Date(b.날짜) - new Date(a.날짜));
+  .sort((a, b) => b.좋아요 - a.좋아요)  // '좋아요' 숫자를 기준으로 내림차순 정렬
+  .slice(0, 3);  // 상위 3개만 선택
+    
 
   const fetchMoreData = () => {
     if (displayedPosts.length >= sortedPosts.length) {
@@ -254,7 +258,7 @@ const App = ({ featuredPosts = [], error = null }) => {
           <HeroContent>
             <Header>Rich <img src="/favicon.png" alt="favicon" style={{ width: '70px', height: '70px', verticalAlign: 'middle'  }} /> News</Header>
             <SubHeader>AI-Selected Latest Economic News</SubHeader>
-            {/* <Button onClick={handleButtonClick}>주 가 예 측</Button> */}
+            <Button onClick={handleButtonClick}>주 가 예 측</Button>
           </HeroContent>
         </HeroSection>
         {error && <p style={{color: 'red'}}>Error: {error}</p>}
