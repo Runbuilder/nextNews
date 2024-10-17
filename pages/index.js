@@ -27,7 +27,173 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-// ... (이전의 styled-components 정의들은 그대로 유지)
+const MainContent = styled.div`
+  flex: 1 0 auto;
+  padding: 20px;
+  padding-bottom: 80px; // Footer 높이만큼 패딩 추가
+  text-align: center;
+`;
+
+const HeroSection = styled.div`
+  position: relative;
+  padding: 50px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  overflow: hidden;
+`;
+
+const VideoBackground = styled.video`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translateX(-50%) translateY(-50%);
+  z-index: -1;
+`;
+
+const HeroContent = styled.div`
+  position: relative;
+  z-index: 1;
+`;
+
+const Header = styled.h1`
+  font-size: 2.8em;
+  margin: 0;
+  color: white;
+  font-weight: 700;
+`;
+
+const SubHeader = styled.p`
+  font-size: 1.2em;
+  margin: 10px 0;
+  color: white;
+`;
+
+const Button = styled.button`
+  background-color: #ff4136;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 1.3em;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  &:hover {
+    background-color: #E7261F;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+  }
+`;
+
+const PostsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 20px;
+  gap: 20px;
+  margin-bottom: 20px;
+`;
+
+const SectionTitle = styled.h2`
+  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333333')};
+  margin-top: 30px;
+  margin-bottom: 1px;
+  font-size: 2.1em;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+`;
+
+const Footer = styled.footer`
+  padding: 20px;
+  text-align: center;
+  color: #ffffff;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+
+  a {
+    color: #ffffff;
+    margin: 0 10px;
+    font-size: 24px;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #cccccc;
+    }
+  }
+`;
+
+const ThemeSwitch = styled.button`
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background-color: ${({ theme }) => (theme === 'light' ? '#333' : '#fff')};
+  color: ${({ theme }) => (theme === 'light' ? '#fff' : '#333')};
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 1000;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+`;
+
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const Layout = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+`;
+
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+`;
+
+const LoadingSpinner = styled.div`
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: ${spin} 1s linear infinite;
+  margin: 20px auto;
+`;
+
 
 const App = ({ featuredPosts = [], error = null }) => {
   const [sortedPosts, setSortedPosts] = useState([]);
@@ -56,9 +222,13 @@ const App = ({ featuredPosts = [], error = null }) => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
+  // const recommendedPosts = sortedPosts
+  //   .filter(post => post.추천 === true)
+  //   .sort((a, b) => new Date(b.날짜) - new Date(a.날짜));
   const recommendedPosts = sortedPosts
-  .sort((a, b) => b.좋아요 - a.좋아요)
-  .slice(0, 3);
+  .sort((a, b) => b.좋아요 - a.좋아요)  // '좋아요' 숫자를 기준으로 내림차순 정렬
+  .slice(0, 3);  // 상위 3개만 선택
+    
 
   const fetchMoreData = () => {
     if (displayedPosts.length >= sortedPosts.length) {
@@ -98,7 +268,7 @@ const App = ({ featuredPosts = [], error = null }) => {
             recommendedPosts.map((post, index) => (
               <Card 
                 key={index}
-                id={post.id}
+                id={post.id} // 추가: 각 포스트의 고유 ID
                 image={post.이모지}
                 title={post.제목}
                 date={post.날짜}
@@ -107,8 +277,8 @@ const App = ({ featuredPosts = [], error = null }) => {
                 category={post.카테고리}
                 backgroundColor={post.색상}
                 theme={theme}
-                views={post.조회수}
-                likes={post.좋아요}
+                views={post.조회수} // 추가: 조회수
+                likes={post.좋아요} // 추가: 좋아요 수
               />
             ))
           ) : (
@@ -127,7 +297,7 @@ const App = ({ featuredPosts = [], error = null }) => {
             {displayedPosts.map((post, index) => (
               <Card 
                 key={index}
-                id={post.id}
+                id={post.id} // 추가: 각 포스트의 고유 ID
                 image={post.이모지}
                 title={post.제목}
                 date={post.날짜}
@@ -136,8 +306,8 @@ const App = ({ featuredPosts = [], error = null }) => {
                 category={post.카테고리}
                 backgroundColor={post.색상}
                 theme={theme}
-                views={post.조회수}
-                likes={post.좋아요}
+                views={post.조회수} // 추가: 조회수
+                likes={post.좋아요} // 추가: 좋아요 수
               />
             ))}
           </PostsContainer>
@@ -164,7 +334,8 @@ const App = ({ featuredPosts = [], error = null }) => {
   );
 };
 
-export async function getServerSideProps() {
+// export async function getStaticProps() {
+  export async function getServerSideProps() {
   const scriptUrl = 'https://script.google.com/macros/s/AKfycbxLtGd_RsGvsLrEvtDHsbaeEq7YnLzn8GzDV3UAQaEKESODls8UJQX70p-rJbKSfSXE/exec?action=getData';
   
   try {
