@@ -6,6 +6,8 @@ import StockPrediction from '../components/StockPrediction';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGlobe, faUser, faComment, faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
 import { faYoutube } from '@fortawesome/free-brands-svg-icons';
+import HeroSection from '../components/HeroSection'; // HeroSection 컴포넌트 임포트
+import LoginPopup from '../components/LoginPopup'; // LoginPopup 컴포넌트 임포트
 
 // 전역 스타일 정의
 const GlobalStyle = createGlobalStyle`
@@ -14,7 +16,7 @@ const GlobalStyle = createGlobalStyle`
     color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')};
     transition: background-color 0.3s ease, color 0.3s ease;
   }
-      @keyframes gradient {
+  @keyframes gradient {
     0% {
       background-position: 0% 50%;
     }
@@ -34,15 +36,6 @@ const MainContent = styled.div`
   text-align: center;
 `;
 
-const HeroSection = styled.div`
-  position: relative;
-  padding: 50px 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  color: white;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-  overflow: hidden;
-`;
 
 const VideoBackground = styled.video`
   position: absolute;
@@ -202,6 +195,7 @@ const App = ({ featuredPosts = [], error = null }) => {
   const [showPrediction, setShowPrediction] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [theme, setTheme] = useState('light');
+  const [showLoginPopup, setShowLoginPopup] = useState(false); // 로그인 팝업 상태 추가
 
   useEffect(() => {
     const sorted = [...featuredPosts].sort((a, b) => new Date(b.날짜) - new Date(a.날짜));
@@ -220,6 +214,14 @@ const App = ({ featuredPosts = [], error = null }) => {
 
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+  };
+
+  const openLoginPopup = () => {
+    setShowLoginPopup(true); // 로그인 팝업 열기
+  };
+
+  const closeLoginPopup = () => {
+    setShowLoginPopup(false); // 로그인 팝업 닫기
   };
 
   // const recommendedPosts = sortedPosts
@@ -250,17 +252,7 @@ const App = ({ featuredPosts = [], error = null }) => {
     <Layout>
       <GlobalStyle theme={theme} />
       <MainContent>
-        <HeroSection>
-          <VideoBackground autoPlay loop muted playsInline>
-            <source src="/video.mp4" type="video/mp4" />
-            브라우저가 비디오 태그를 지원하지 않습니다.
-          </VideoBackground>
-          <HeroContent>
-            <Header>Rich <img src="/favicon.png" alt="favicon" style={{ width: '70px', height: '70px', verticalAlign: 'middle'  }} /> News</Header>
-            <SubHeader>AI-Selected Latest Economic News</SubHeader>
-            <Button onClick={handleButtonClick}>주 가 예 측</Button>
-          </HeroContent>
-        </HeroSection>
+        <HeroSection onButtonClick={openLoginPopup} /> {/* HeroSection에서 로그인 팝업 열기 */}
         {error && <p style={{color: 'red'}}>Error: {error}</p>}
         <SectionTitle theme={theme}>Featured Posts</SectionTitle>
         <PostsContainer>
@@ -330,6 +322,7 @@ const App = ({ featuredPosts = [], error = null }) => {
           <StockPrediction onClose={handleClosePrediction} theme={theme} />
         </Overlay>
       )}
+      {showLoginPopup && <LoginPopup onClose={closeLoginPopup} theme={theme} />} {/* 로그인 팝업 추가 */}
     </Layout>
   );
 };
@@ -346,7 +339,6 @@ const App = ({ featuredPosts = [], error = null }) => {
     }
 
     const data = await res.json();
-    console.log('원본 데이터:', JSON.stringify(data, null, 2));
 
     if (!Array.isArray(data)) {
       throw new Error('Received data is not an array');

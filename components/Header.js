@@ -1,25 +1,29 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import LoginPopup from './LoginPopup'
+import { Button } from "@/components/ui/button"
 
-export default function Header({ user }) {
+export default function Header() {
   const [loading, setLoading] = useState(false)
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [user, setUser] = useState(null)
 
-  const handleLogin = async (provider) => {
-    try {
-      setLoading(true)
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: window.location.origin,
-        },
-      })
-      if (error) throw error
-    } catch (error) {
-      alert(error.error_description || error.message)
-    } finally {
-      setLoading(false)
+  useEffect(() => {
+    const fetchSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      setUser(session?.user ?? null)
     }
-  }
+
+    fetchSession()
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => {
+      authListener.subscription.unsubscribe()
+    }
+  }, [])
 
   const handleLogout = async () => {
     try {
@@ -31,23 +35,31 @@ export default function Header({ user }) {
   }
 
   return (
-    <header style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', backgroundColor: '#f0f0f0' }}>
-      <h1>내 웹사이트</h1>
-      <div>
-        {user ? (
-          <button onClick={handleLogout}>로그아웃</button>
-        ) : (
-          <>
-            <button onClick={() => handleLogin('google')} disabled={loading}>
-              Google 로그인
-            </button>
-            <button onClick={() => handleLogin('kakao')} disabled={loading} style={{ marginLeft: '10px' }}>
-              Kakao 로그인
-            </button>
-          </>
-        )}
-      </div>
-    </header>
+    <>
+      <header className="flex justify-between items-center px-5 bg-gray-100">
+        <div className="flex items-center">
+          {user && (
+            <div className="flex items-center">
+              <img src={user.user_metadata.avatar_url} alt="User Avatar" className="w-8 h-8 rounded-full mr-2" />
+              <span className="font-bold">{user.user_metadata.full_name}</span>
+            </div>
+          )}
+        </div>
+        <div>
+          {user ? (
+            <Button onClick={handleLogout} variant="outline">로그아웃</Button>
+          ) : (
+            <Button 
+              onClick={() => setIsPopupOpen(true)} 
+              disabled={loading}
+              variant="default"
+            >
+              로그인
+            </Button>
+          )}
+        </div>
+      </header>
+      {isPopupOpen && <LoginPopup onClose={() => setIsPopupOpen(false)} />}
+    </>
   )
 }
-
