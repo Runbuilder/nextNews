@@ -80,6 +80,8 @@ const HeroSection = ({ onButtonClick }) => {
         </Header>
       </HeroContent>
         <SubHeader>AI-Selected Latest Economic News</SubHeader>
+        <div>
+        </div>
         <Button onClick={onButtonClick}>주 가 예 측</Button>
     </HeroSectionWrapper>
   );
