@@ -42,15 +42,21 @@ const PostsPage = () => {
   };
 
   const incrementViews = async (postId, currentViews) => {
-    const { data, error } = await supabase
-      .from('posts')
-      .update({ views: currentViews + 1 })
-      .eq('id', postId);
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .update({ views: currentViews + 1 })
+        .eq('id', postId)
+        .select();
 
-    if (error) {
+      if (error) throw error;
+
+      // 업데이트된 게시물로 posts 상태 업데이트
+      setPosts(prevPosts => prevPosts.map(post => 
+        post.id === postId ? { ...post, views: currentViews + 1 } : post
+      ));
+    } catch (error) {
       console.error('Error incrementing views:', error);
-    } else {
-      fetchPosts(); // Refresh posts to update the view count
     }
   };
 
@@ -79,9 +85,9 @@ const PostsPage = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  const handlePostClick = (post) => {
-    setSelectedPost(post);
-    incrementViews(post.id, post.views);
+  const handlePostClick = async (post) => {
+    await incrementViews(post.id, post.views);
+    setSelectedPost({ ...post, views: post.views + 1 });
   };
 
   const handleWriteClick = () => {
@@ -183,7 +189,7 @@ const PostsPage = () => {
               <div className="flex items-center">
                 <Avatar className="mr-2">
                   <AvatarImage src={selectedPost.profiles?.avatar_url} />
-                  <AvatarFallback>{selectedPost.profiles?.full_name?.[0] || 'U'}</AvatarFallback>
+                  {/* <AvatarFallback>{selectedPost.profiles?.full_name?.[0] || 'U'}</AvatarFallback> */}
                 </Avatar>
                 <h3 className="text-xl font-bold">{selectedPost.title}</h3>
               </div>
@@ -197,7 +203,6 @@ const PostsPage = () => {
             <p>{selectedPost.content}</p>
             <div className="mt-4 text-sm text-gray-500">
               <span>조회수: {selectedPost.views}</span>
-              <span className="ml-4">댓글: {selectedPost.comments}</span>
             </div>
             <Button onClick={() => setSelectedPost(null)} className="mt-4">목록으로 돌아가기</Button>
           </div>
@@ -211,7 +216,7 @@ const PostsPage = () => {
                       <div className="flex items-center">
                         <Avatar className="mr-2">
                           <AvatarImage src={post.profiles?.avatar_url} />
-                          <AvatarFallback>{post.profiles?.full_name?.[0] || 'U'}</AvatarFallback>
+                          {/* <AvatarFallback>{post.profiles?.full_name?.[0] || 'U'}</AvatarFallback> */}
                         </Avatar>
                         <div>
                           <h3 className="text-lg font-semibold">{post.title}</h3>
@@ -220,7 +225,6 @@ const PostsPage = () => {
                       </div>
                       <div className="text-sm text-gray-500">
                         <span>조회수: {post.views}</span>
-                        <span className="ml-2">댓글: {post.comments}</span>
                       </div>
                     </div>
                   </CardContent>
