@@ -4,8 +4,6 @@ import styled from 'styled-components';
 const HeroSectionWrapper = styled.div`
   position: relative;
   padding: 50px 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
   color: white;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   overflow: hidden;

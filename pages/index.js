@@ -32,7 +32,6 @@ const GlobalStyle = createGlobalStyle`
 
 const MainContent = styled.div`
   flex: 1 0 auto;
-  padding: 20px;
   padding-bottom: 80px; // Footer 높이만큼 패딩 추가
   text-align: center;
 `;

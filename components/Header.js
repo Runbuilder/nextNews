@@ -52,13 +52,13 @@ export default function Header() {
 
   return (
     <>
-      <header className="flex justify-between items-center px-5 bg-gray-100 pt-5">
+      <header className="flex justify-between items-center p-2 bg-gray-100">
         <div className="flex items-center">
           <Button onClick={handleNavigation} variant="default">
             {isOnPostsPage ? 'HOME' : 'COMMUNITY'}
           </Button>
         </div>
-        <div>
+        <div className="flex items-center">
           {user && (
             <div className="flex items-center">
               <img src={user.user_metadata.avatar_url} alt="User Avatar" className="w-8 h-8 rounded-full mr-2" />
