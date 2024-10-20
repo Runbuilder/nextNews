@@ -66,7 +66,7 @@ export default function Header() {
             </div>
           )}
           {user ? (
-            <Button onClick={handleLogout} variant="default">로그아웃</Button>
+            <Button onClick={handleLogout} variant="default" ml-2>로그아웃</Button>
           ) : (
             <Button 
               onClick={() => setIsPopupOpen(true)} 

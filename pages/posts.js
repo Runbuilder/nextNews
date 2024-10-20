@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { ChevronLeft, ChevronRight, Search, PenSquare } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, PenSquare, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
@@ -31,13 +31,41 @@ const PostsPage = () => {
   const fetchPosts = async () => {
     const { data, error } = await supabase
       .from('posts')
-      .select('*')
+      .select('*, profiles:author_id(*)')
       .order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching posts:', error);
     } else {
       setPosts(data);
+    }
+  };
+
+  const incrementViews = async (postId, currentViews) => {
+    const { data, error } = await supabase
+      .from('posts')
+      .update({ views: currentViews + 1 })
+      .eq('id', postId);
+
+    if (error) {
+      console.error('Error incrementing views:', error);
+    } else {
+      fetchPosts(); // Refresh posts to update the view count
+    }
+  };
+
+  const deletePost = async (postId) => {
+    const { error } = await supabase
+      .from('posts')
+      .delete()
+      .eq('id', postId);
+
+    if (error) {
+      console.error('Error deleting post:', error);
+      alert('게시물 삭제에 실패했습니다.');
+    } else {
+      fetchPosts(); // Refresh posts after deletion
+      setSelectedPost(null);
     }
   };
 
@@ -53,6 +81,7 @@ const PostsPage = () => {
 
   const handlePostClick = (post) => {
     setSelectedPost(post);
+    incrementViews(post.id, post.views);
   };
 
   const handleWriteClick = () => {
@@ -77,7 +106,9 @@ const PostsPage = () => {
         { 
           title: newPost.title, 
           content: newPost.content,
-          author_id: user.id
+          author_id: user.id,
+          views: 0,
+          comments: 0
         }
       ]);
 
@@ -148,8 +179,26 @@ const PostsPage = () => {
           </form>
         ) : selectedPost ? (
           <div>
-            <h3 className="text-xl font-bold mb-4">{selectedPost.title}</h3>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <Avatar className="mr-2">
+                  <AvatarImage src={selectedPost.profiles?.avatar_url} />
+                  <AvatarFallback>{selectedPost.profiles?.full_name?.[0] || 'U'}</AvatarFallback>
+                </Avatar>
+                <h3 className="text-xl font-bold">{selectedPost.title}</h3>
+              </div>
+              {user && user.id === selectedPost.author_id && (
+                <Button variant="destructive" onClick={() => deletePost(selectedPost.id)}>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  삭제
+                </Button>
+              )}
+            </div>
             <p>{selectedPost.content}</p>
+            <div className="mt-4 text-sm text-gray-500">
+              <span>조회수: {selectedPost.views}</span>
+              <span className="ml-4">댓글: {selectedPost.comments}</span>
+            </div>
             <Button onClick={() => setSelectedPost(null)} className="mt-4">목록으로 돌아가기</Button>
           </div>
         ) : (
@@ -159,9 +208,19 @@ const PostsPage = () => {
                 <Card>
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold">{post.title}</h3>
-                        <p className="text-sm text-gray-500">{new Date(post.created_at).toLocaleDateString()}</p>
+                      <div className="flex items-center">
+                        <Avatar className="mr-2">
+                          <AvatarImage src={post.profiles?.avatar_url} />
+                          <AvatarFallback>{post.profiles?.full_name?.[0] || 'U'}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h3 className="text-lg font-semibold">{post.title}</h3>
+                          <p className="text-sm text-gray-500">{new Date(post.created_at).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        <span>조회수: {post.views}</span>
+                        <span className="ml-2">댓글: {post.comments}</span>
                       </div>
                     </div>
                   </CardContent>
