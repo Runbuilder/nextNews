@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Swal from 'sweetalert2';
+import { supabase } from '../lib/supabaseClient';
 
 const CardContainer = styled.div`
   width: 100%;
@@ -43,7 +44,7 @@ const CategoryTag = styled.div`
 
 const CardImage = styled.div`
   font-size: 72px;
-  margin-bottom: 16px;
+  margin: 36px 0 6px 0;
 `;
 
 const CardTitle = styled.h3`
@@ -113,16 +114,14 @@ const Card = ({ id, image, title, date, content, source, category, backgroundCol
 
   const incrementViews = async () => {
     try {
-      await fetch(`https://script.google.com/macros/s/AKfycbxLtGd_RsGvsLrEvtDHsbaeEq7YnLzn8GzDV3UAQaEKESODls8UJQX70p-rJbKSfSXE/exec`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          action: 'incrementViews',
-          id: id,
-        }),
-      });
+      const { data, error } = await supabase
+        .from('news1')
+        .update({ 조회수: currentViews + 1 })
+        .eq('id', id)
+        .select();
+
+      if (error) throw error;
+
       setCurrentViews(prevViews => prevViews + 1);
     } catch (error) {
       console.error('Error incrementing views:', error);
@@ -136,16 +135,14 @@ const Card = ({ id, image, title, date, content, source, category, backgroundCol
     }
 
     try {
-      await fetch(`https://script.google.com/macros/s/AKfycbxLtGd_RsGvsLrEvtDHsbaeEq7YnLzn8GzDV3UAQaEKESODls8UJQX70p-rJbKSfSXE/exec`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          action: 'incrementLikes',
-          id: id,
-        }),
-      });
+      const { data, error } = await supabase
+        .from('news1')
+        .update({ 좋아요: currentLikes + 1 })
+        .eq('id', id)
+        .select();
+
+      if (error) throw error;
+
       setCurrentLikes(prevLikes => prevLikes + 1);
       setIsLiked(true);
       const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '{}');
@@ -159,7 +156,7 @@ const Card = ({ id, image, title, date, content, source, category, backgroundCol
   };
 
   const handleCardClick = async () => {
-    incrementViews();
+    await incrementViews();
     Swal.fire({
       title: `<span style="font-size: 3.1em; text-align: center;">${image}</span>`,
       html: `

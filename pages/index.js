@@ -6,8 +6,9 @@ import StockPrediction from '../components/StockPrediction';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGlobe, faUser, faComment, faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
 import { faYoutube } from '@fortawesome/free-brands-svg-icons';
-import HeroSection from '../components/HeroSection'; // HeroSection 컴포넌트 임포트
-import LoginPopup from '../components/LoginPopup'; // LoginPopup 컴포넌트 임포트
+import HeroSection from '../components/HeroSection';
+import LoginPopup from '../components/LoginPopup';
+import { supabase } from '../lib/supabaseClient'; // Supabase 클라이언트 import
 
 // 전역 스타일 정의
 const GlobalStyle = createGlobalStyle`
@@ -252,7 +253,7 @@ const App = ({ featuredPosts = [], error = null }) => {
     <Layout>
       <GlobalStyle theme={theme} />
       <MainContent>
-        <HeroSection onButtonClick={openLoginPopup} /> {/* HeroSection에서 로그인 팝업 열기 */}
+        <HeroSection onButtonClick={handleButtonClick} />
         {error && <p style={{color: 'red'}}>Error: {error}</p>}
         <SectionTitle theme={theme}>Featured Posts</SectionTitle>
         <PostsContainer>
@@ -260,7 +261,7 @@ const App = ({ featuredPosts = [], error = null }) => {
             recommendedPosts.map((post, index) => (
               <Card 
                 key={index}
-                id={post.id} // 추가: 각 포스트의 고유 ID
+                id={post.id}
                 image={post.이모지}
                 title={post.제목}
                 date={post.날짜}
@@ -269,8 +270,8 @@ const App = ({ featuredPosts = [], error = null }) => {
                 category={post.카테고리}
                 backgroundColor={post.색상}
                 theme={theme}
-                views={post.조회수} // 추가: 조회수
-                likes={post.좋아요} // 추가: 좋아요 수
+                views={post.조회수}
+                likes={post.좋아요}
               />
             ))
           ) : (
@@ -289,7 +290,7 @@ const App = ({ featuredPosts = [], error = null }) => {
             {displayedPosts.map((post, index) => (
               <Card 
                 key={index}
-                id={post.id} // 추가: 각 포스트의 고유 ID
+                id={post.id}
                 image={post.이모지}
                 title={post.제목}
                 date={post.날짜}
@@ -298,8 +299,8 @@ const App = ({ featuredPosts = [], error = null }) => {
                 category={post.카테고리}
                 backgroundColor={post.색상}
                 theme={theme}
-                views={post.조회수} // 추가: 조회수
-                likes={post.좋아요} // 추가: 좋아요 수
+                views={post.조회수}
+                likes={post.좋아요}
               />
             ))}
           </PostsContainer>
@@ -327,31 +328,27 @@ const App = ({ featuredPosts = [], error = null }) => {
   );
 };
 
-// export async function getStaticProps() {
-  export async function getServerSideProps() {
-  const scriptUrl = 'https://script.google.com/macros/s/AKfycbxLtGd_RsGvsLrEvtDHsbaeEq7YnLzn8GzDV3UAQaEKESODls8UJQX70p-rJbKSfSXE/exec?action=getData';
-  
+export async function getServerSideProps() {
   try {
-    const res = await fetch(scriptUrl);
-    
-    if (!res.ok) {
-      throw new Error(`Failed to fetch data: ${res.status} ${res.statusText}`);
+    const { data, error } = await supabase
+      .from('news1')
+      .select('*')
+      .order('날짜', { ascending: false });
+
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
     }
 
-    const data = await res.json();
-
-    if (!Array.isArray(data)) {
-      throw new Error('Received data is not an array');
-    }
-
-    const featuredPosts = data;
+    console.log("Fetched data:", data); // 서버 콘솔에 로그 출력
 
     return {
       props: {
-        featuredPosts,
+        featuredPosts: data || [],
       },
     };
   } catch (error) {
+    console.error('Error in getServerSideProps:', error);
     return {
       props: {
         featuredPosts: [],

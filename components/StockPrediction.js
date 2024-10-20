@@ -104,12 +104,13 @@ const CloseButton = styled.button`
   position: absolute;
   top: 10px;
   right: 10px;
-  background: #ff4136;
+  padding: 0 10px;
+  background: #ffffff;
   border-radius: 5px;
   border: none;
   font-size: 30px;
   cursor: pointer;
-  color: #ffffff;
+  color: #000000;
 `;
 
 const ResultContainer = styled.div`
@@ -287,7 +288,8 @@ const StockPrediction = ({ onClose, theme }) => {
   return (
     <Overlay>
       <PopupContent ref={popupRef} theme={theme}>
-        <CloseButton onClick={onClose}>&times;</CloseButton>
+        <CloseButton onClick={onClose}> X </CloseButton>
+        
         <Title>🧙‍♂️</Title>
         <InputContainer>
           <Input 

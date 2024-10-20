@@ -43,7 +43,7 @@ const Header = styled.h1`
 
 const SubHeader = styled.p`
   font-size: 1.2em;
-  margin: 0;
+  margin: 0 0 30px 0;
   color: white;
 `;
 
@@ -80,8 +80,6 @@ const HeroSection = ({ onButtonClick }) => {
         </Header>
       </HeroContent>
         <SubHeader>AI-Selected Latest Economic News</SubHeader>
-        <div>
-        </div>
         <Button onClick={onButtonClick}>주 가 예 측</Button>
     </HeroSectionWrapper>
   );
