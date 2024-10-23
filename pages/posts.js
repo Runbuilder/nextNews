@@ -189,7 +189,6 @@ const PostsPage = () => {
               <div className="flex items-center">
                 <Avatar className="mr-2">
                   <AvatarImage src={selectedPost.profiles?.avatar_url} />
-                  {/* <AvatarFallback>{selectedPost.profiles?.full_name?.[0] || 'U'}</AvatarFallback> */}
                 </Avatar>
                 <h3 className="text-xl font-bold">{selectedPost.title}</h3>
               </div>
@@ -216,7 +215,6 @@ const PostsPage = () => {
                       <div className="flex items-center">
                         <Avatar className="mr-2">
                           <AvatarImage src={post.profiles?.avatar_url} />
-                          {/* <AvatarFallback>{post.profiles?.full_name?.[0] || 'U'}</AvatarFallback> */}
                         </Avatar>
                         <div>
                           <h3 className="text-lg font-semibold">{post.title}</h3>

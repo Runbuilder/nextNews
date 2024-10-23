@@ -103,32 +103,6 @@ const SectionTitle = styled.h2`
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 `;
 
-const Footer = styled.footer`
-  padding: 20px;
-  text-align: center;
-  color: #ffffff;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-  background-size: 400% 400%;
-  animation: gradient 15s ease infinite;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-
-  a {
-    color: #ffffff;
-    margin: 0 10px;
-    font-size: 24px;
-    transition: color 0.3s ease;
-
-    &:hover {
-      color: #cccccc;
-    }
-  }
-`;
-
 const ThemeSwitch = styled.button`
   position: fixed;
   bottom: 80px;
@@ -305,15 +279,6 @@ const App = ({ featuredPosts = [], error = null }) => {
           </PostsContainer>
         </InfiniteScroll>
       </MainContent>
-      <Footer>
-        <p style={{ margin: 0, textAlign: 'center' }}>
-          <span style={{ fontWeight: 'bold', fontSize: '20px' }}>© 2024RunBuild</span>
-        
-          <a href="https://www.youtube.com/@runbuild" target="_blank" rel="noopener noreferrer">
-            <FontAwesomeIcon icon={faYoutube} />
-          </a>
-        </p>
-      </Footer>
       <ThemeSwitch theme={theme} onClick={toggleTheme}>
         <FontAwesomeIcon icon={theme === 'light' ? faMoon : faSun} />
       </ThemeSwitch>
@@ -322,7 +287,7 @@ const App = ({ featuredPosts = [], error = null }) => {
           <StockPrediction onClose={handleClosePrediction} theme={theme} />
         </Overlay>
       )}
-      {showLoginPopup && <LoginPopup onClose={closeLoginPopup} theme={theme} />} {/* 로그인 팝업 추가 */}
+      {showLoginPopup && <LoginPopup onClose={closeLoginPopup} theme={theme} />}
     </Layout>
   );
 };

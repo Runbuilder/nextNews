@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { supabase } from '../lib/supabaseClient'; // Supabase 클라이언트 import
 
 const API_URL = 'https://openai.highbuff.com/';
 
@@ -184,12 +185,30 @@ const PredictButton = styled(Button)`
   }
 `;
 
+const StatsContainer = styled.div`
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+`;
+
+const StatItem = styled.span`
+  margin: 0 10px;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 5px 10px;
+  border-radius: 15px;
+`;
+
 const StockPrediction = ({ onClose, theme }) => {
   const [stockName, setStockName] = useState('');
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const popupRef = useRef(null);
+  const [predictionStats, setPredictionStats] = useState({
+    totalCount: 0,
+    todayCount: 0,
+    weekCount: 0
+  });
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -202,7 +221,75 @@ const StockPrediction = ({ onClose, theme }) => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
+
+    // 예측 통계 가져오기
+    fetchPredictionStats();
   }, [onClose]);
+
+  const fetchPredictionStats = async () => {
+    const { data, error } = await supabase
+      .from('prediction_stats')
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('예측 통계 조회 오류:', error);
+      return;
+    }
+
+    setPredictionStats({
+      totalCount: data.total_count,
+      todayCount: data.today_count,
+      weekCount: data.week_count
+    });
+  };
+
+  const updatePredictionStats = async () => {
+    const now = new Date();
+    const { data, error } = await supabase
+      .from('prediction_stats')
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('예측 통계 조회 오류:', error);
+      return;
+    }
+
+    const lastUpdated = new Date(data.last_updated);
+
+    let newStats = {
+      total_count: data.total_count + 1,
+      today_count: data.today_count + 1,
+      week_count: data.week_count + 1,
+      last_updated: now.toISOString()
+    };
+
+    // 날짜가 변경되었다면 오늘 카운트 초기화
+    if (now.toDateString() !== lastUpdated.toDateString()) {
+      newStats.today_count = 1;
+    }
+
+    // 주가 변경되었다면 이번 주 카운트 초기화
+    if (now.getDay() < lastUpdated.getDay()) {
+      newStats.week_count = 1;
+    }
+
+    const { error: updateError } = await supabase
+      .from('prediction_stats')
+      .update(newStats)
+      .eq('id', 1);
+
+    if (updateError) {
+      console.error('예측 통계 업데이트 오류:', updateError);
+    } else {
+      setPredictionStats({
+        totalCount: newStats.total_count,
+        todayCount: newStats.today_count,
+        weekCount: newStats.week_count
+      });
+    }
+  };
 
   const getStockForecast = async () => {
     if (!stockName) {
@@ -230,12 +317,13 @@ const StockPrediction = ({ onClose, theme }) => {
           <p>3) 예측 결과에 따라 사람이 직접 추격 매수 및 손절 할 경우, 매매 시간 지연에 따라 손실이 발생할 수 있으며, 시간 지연 문제에 도움을 받기 위해선 <a href="https://highbuff.com/person" target="_blank">HIGHBUFF AI</a> 서비스를 무료 체험해 보시길 바랍니다.</p>
           <p>4) 이 정보를 활용한 투자 책임은 본인에게 있으며, 자세한 알고리즘 및 기술에 관련된 자세한 정보는 <a href="https://highbuff.com/person" target="_blank">HIGHBUFF AI</a>에서 확인 가능합니다.</p>
         `);
+        updatePredictionStats(); // 예측 통계 업데이트
       } else {
         setError(`${stockName}에 대한 예측 차트를 생성할 수 없습니다. 다른 종목을 입력해 주세요.`);
       }
     } catch (error) {
       console.error('Error fetching stock forecast:', error);
-      setError(`😪현재는 주가를 예측할 수 있는 상황입니다. 나중에 다시 시도해 주세요.`);
+      setError(`😪현재는 예측 차트를 생성하기 위한 데이터가 충분하지 않습니다.나중에 다시 시도해 주세요.`);
     } finally {
       setIsLoading(false);
     }
@@ -265,7 +353,7 @@ const StockPrediction = ({ onClose, theme }) => {
       setResult(html);
     } catch (error) {
       console.error('Error fetching market cap:', error);
-      setError(`시가총액 정보를 가져오는 중 오류가 발생했습니다. 다시 시도해 주세요.`);
+      setError(`현재는 예측 차트를 생성하기 위한 데이터가 충분하지 않습니다.`);
     } finally {
       setIsLoading(false);
     }
@@ -300,8 +388,11 @@ const StockPrediction = ({ onClose, theme }) => {
           />
           <PredictButton onClick={getStockForecast}>예측 차트 보기</PredictButton>
         </InputContainer>
-        <ButtonContainer>
-          <Button onClick={() => getMarketCap('KOSPI')}>KOSPI 시가총액</Button>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}> 
+(예측 차트 생성은 장중시간 9:40~15:30 에만 가능합니다)
+          </div>
+          <ButtonContainer>
+            <Button onClick={() => getMarketCap('KOSPI')}>KOSPI 시가총액</Button>
           <Button onClick={() => getMarketCap('KOSDAQ')}>KOSDAQ 시가총액</Button>
         </ButtonContainer>
         {error && <ResultContainer>{error}</ResultContainer>}
@@ -312,6 +403,11 @@ const StockPrediction = ({ onClose, theme }) => {
         ) : (
           result && <ResultContainer dangerouslySetInnerHTML={{ __html: result }} />
         )}
+        <StatsContainer>
+          <StatItem>누적 예측: {predictionStats.totalCount}</StatItem>
+          <StatItem>오늘 예측: {predictionStats.todayCount}</StatItem>
+          <StatItem>이번 주 예측: {predictionStats.weekCount}</StatItem>
+        </StatsContainer>
       </PopupContent>
     </Overlay>
   );
